@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/slices/authSlice';
-import { authService } from '../../services/authService';
 import toast from 'react-hot-toast';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { getUserByEmail, setCurrentUser } from '../../utils/localStorage';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -18,22 +18,42 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await authService.login(formData);
+      // Get user from localStorage
+      const user = getUserByEmail(formData.email);
       
-      // Store tokens
-      localStorage.setItem('token', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (!user) {
+        toast.error('User not found. Please register first.');
+        setLoading(false);
+        return;
+      }
       
+      // Check password
+      if (user.password !== formData.password) {
+        toast.error('Invalid password');
+        setLoading(false);
+        return;
+      }
+      
+      // Remove password before storing
+      const userWithoutPassword = { ...user };
+      delete userWithoutPassword.password;
+      
+      // Set as current user
+      setCurrentUser(userWithoutPassword);
+      
+      const mockToken = 'token-' + user.id;
+      localStorage.setItem('token', mockToken);
+      
+      // Update Redux state
       dispatch(setUser({
-        user: response.data.user,
-        token: response.data.accessToken
+        user: userWithoutPassword,
+        token: mockToken
       }));
       
       toast.success('Login successful!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Login failed');
+      toast.error('Login failed');
     } finally {
       setLoading(false);
     }

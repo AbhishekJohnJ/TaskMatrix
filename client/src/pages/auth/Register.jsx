@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/slices/authSlice';
-import { authService } from '../../services/authService';
 import toast from 'react-hot-toast';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { saveUser, setCurrentUser, getUserByEmail, initializeDemoData } from '../../utils/localStorage';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -28,25 +28,58 @@ const Register = () => {
       return;
     }
     
+    if (formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    
     setLoading(true);
     
     try {
-      const response = await authService.register(formData);
+      // Check if user already exists
+      const existingUser = getUserByEmail(formData.email);
+      if (existingUser) {
+        toast.error('Email already registered');
+        setLoading(false);
+        return;
+      }
       
-      // Store tokens
-      localStorage.setItem('token', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Create new user
+      const newUser = {
+        id: Date.now().toString(),
+        fullName: formData.fullName,
+        username: formData.username,
+        email: formData.email,
+        password: formData.password, // In production, this should be hashed
+        role: 'user',
+        profilePicture: null,
+        createdAt: new Date().toISOString(),
+      };
       
+      // Save user to localStorage
+      saveUser(newUser);
+      
+      // Set as current user
+      const userWithoutPassword = { ...newUser };
+      delete userWithoutPassword.password;
+      setCurrentUser(userWithoutPassword);
+      
+      const mockToken = 'token-' + newUser.id;
+      localStorage.setItem('token', mockToken);
+      
+      // Update Redux state
       dispatch(setUser({
-        user: response.data.user,
-        token: response.data.accessToken
+        user: userWithoutPassword,
+        token: mockToken
       }));
       
-      toast.success('Registration successful!');
+      // Initialize demo data
+      initializeDemoData(newUser.id);
+      
+      toast.success('Registration successful! Welcome to TaskMatrix!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Registration failed');
+      toast.error('Registration failed');
     } finally {
       setLoading(false);
     }

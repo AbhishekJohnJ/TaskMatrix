@@ -21,6 +21,7 @@ import Calendar from './pages/Calendar';
 import Teams from './pages/Teams';
 import TeamDetail from './pages/TeamDetail';
 import Analytics from './pages/Analytics';
+import About from './pages/About';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
@@ -97,9 +98,8 @@ function App() {
         <Route path="/tasks/:id" element={<TaskDetail />} />
         <Route path="/kanban" element={<KanbanBoard />} />
         <Route path="/calendar" element={<Calendar />} />
-        <Route path="/teams" element={<Teams />} />
-        <Route path="/teams/:id" element={<TeamDetail />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
