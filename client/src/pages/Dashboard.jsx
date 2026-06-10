@@ -36,10 +36,10 @@ const Dashboard = () => {
   };
 
   const statCards = [
-    { label: 'Total Tasks', value: stats.total, icon: HiClipboardCheck, color: 'bg-blue-500', change: '+12%' },
-    { label: 'In Progress', value: stats.inProgress, icon: HiClock, color: 'bg-yellow-500', change: '+5%' },
-    { label: 'Completed', value: stats.completed, icon: HiTrendingUp, color: 'bg-green-500', change: '+23%' },
-    { label: 'To Do', value: stats.todo, icon: HiFlag, color: 'bg-purple-500', change: '-8%' },
+    { label: 'Total Tasks', value: stats.total, icon: HiClipboardCheck, color: 'bg-red-500', change: '+12%' },
+    { label: 'In Progress', value: stats.inProgress, icon: HiClock, color: 'bg-red-600', change: '+5%' },
+    { label: 'Completed', value: stats.completed, icon: HiTrendingUp, color: 'bg-red-700', change: '+23%' },
+    { label: 'To Do', value: stats.todo, icon: HiFlag, color: 'bg-red-800', change: '-8%' },
   ];
 
   const getStatusBadge = (status) => {
@@ -55,7 +55,7 @@ const Dashboard = () => {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Welcome back, {user?.fullName}! 👋
+          Welcome back, {user?.fullName}!
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
           Here's what's happening with your projects today.
@@ -111,7 +111,7 @@ const Dashboard = () => {
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-600 dark:text-gray-400 mb-4">No tasks yet</p>
-              <Link to="/tasks" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 inline-block">
+              <Link to="/tasks" className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 inline-block">
                 Create Your First Task
               </Link>
             </div>
@@ -124,25 +124,25 @@ const Dashboard = () => {
           <div className="space-y-3">
             <Link
               to="/tasks"
-              className="block w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 text-center font-medium transition-colors"
+              className="block w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 text-center font-medium transition-colors"
             >
               Create New Task
             </Link>
             <Link
               to="/kanban"
-              className="block w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 text-center font-medium transition-colors"
+              className="block w-full bg-red-700 text-white py-3 rounded-lg hover:bg-red-800 text-center font-medium transition-colors"
             >
               View Kanban Board
             </Link>
             <Link
               to="/calendar"
-              className="block w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 text-center font-medium transition-colors"
+              className="block w-full bg-red-800 text-white py-3 rounded-lg hover:bg-red-900 text-center font-medium transition-colors"
             >
               Open Calendar
             </Link>
             <Link
               to="/analytics"
-              className="block w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 text-center font-medium transition-colors"
+              className="block w-full bg-red-900 text-white py-3 rounded-lg hover:bg-red-950 text-center font-medium transition-colors"
             >
               View Analytics
             </Link>

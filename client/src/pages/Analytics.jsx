@@ -319,7 +319,6 @@ const Analytics = () => {
           <div className="space-y-3">
             {analytics.total === 0 ? (
               <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <span className="text-2xl">📝</span>
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-white">Get Started</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Create your first task to start tracking productivity.</p>
@@ -329,7 +328,6 @@ const Analytics = () => {
               <>
                 {analytics.completionRate >= 70 && (
                   <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <span className="text-2xl">🎉</span>
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">Excellent Performance</p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">You're maintaining a strong completion rate!</p>
@@ -338,7 +336,6 @@ const Analytics = () => {
                 )}
                 {analytics.overdue > 0 && (
                   <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                    <span className="text-2xl">⚠️</span>
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">Attention Needed</p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">{analytics.overdue} task{analytics.overdue > 1 ? 's are' : ' is'} overdue. Prioritize these immediately.</p>
@@ -347,7 +344,6 @@ const Analytics = () => {
                 )}
                 {analytics.highPriority > analytics.completed && analytics.highPriority > 0 && (
                   <div className="flex items-start gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                    <span className="text-2xl">🎯</span>
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">Focus on High Priority</p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">You have {analytics.highPriority} high-priority tasks requiring attention.</p>
@@ -356,7 +352,6 @@ const Analytics = () => {
                 )}
                 {analytics.inProgress > analytics.completed * 1.5 && analytics.inProgress > 0 && (
                   <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <span className="text-2xl">💡</span>
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">Finish Before Starting</p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Complete in-progress tasks before taking on new ones.</p>

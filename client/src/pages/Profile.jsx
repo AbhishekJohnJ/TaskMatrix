@@ -149,7 +149,7 @@ const Profile = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column - Profile Card */}
         <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 h-full">
+          <div className="bg-white dark:bg-black rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-900 h-full">
             {/* Avatar */}
             <div className="flex flex-col items-center mb-6">
               <div className="relative">
@@ -160,7 +160,7 @@ const Profile = () => {
                     className="w-32 h-32 rounded-full object-cover shadow-xl border-4 border-white dark:border-gray-700"
                   />
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-4xl font-bold shadow-xl">
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white text-4xl font-bold shadow-xl">
                     {getInitials(user?.fullName)}
                   </div>
                 )}
@@ -175,7 +175,7 @@ const Profile = () => {
                     />
                     <label
                       htmlFor="avatar-upload"
-                      className="absolute bottom-0 right-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors shadow-lg cursor-pointer"
+                      className="absolute bottom-0 right-0 w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
                       title="Change profile picture"
                     >
                       <HiCamera size={20} />
@@ -205,21 +205,21 @@ const Profile = () => {
             <div className="space-y-3 pt-6 border-t border-gray-200 dark:border-gray-700 flex-1">
               <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <HiCheckCircle className="text-green-500" size={20} />
+                  <HiCheckCircle className="text-red-500" size={20} />
                   <span className="text-sm text-gray-600 dark:text-gray-400">Completed</span>
                 </div>
                 <span className="font-bold text-gray-900 dark:text-white">{stats.completedTasks}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <HiClock className="text-blue-500" size={20} />
+                  <HiClock className="text-red-500" size={20} />
                   <span className="text-sm text-gray-600 dark:text-gray-400">In Progress</span>
                 </div>
                 <span className="font-bold text-gray-900 dark:text-white">{stats.inProgressTasks}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <HiTrendingUp className="text-purple-500" size={20} />
+                  <HiTrendingUp className="text-red-500" size={20} />
                   <span className="text-sm text-gray-600 dark:text-gray-400">Success Rate</span>
                 </div>
                 <span className="font-bold text-gray-900 dark:text-white">{stats.completionRate}%</span>
@@ -230,13 +230,13 @@ const Profile = () => {
 
         {/* Right Column - Profile Information */}
         <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-black rounded-xl p-8 shadow-lg border border-gray-200 dark:border-gray-900">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Personal Information</h3>
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
                   <HiPencil size={20} />
                   <span>Edit Profile</span>
@@ -305,7 +305,7 @@ const Profile = () => {
                 <div className="flex gap-4 pt-4">
                   <button
                     type="submit"
-                    className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium transition-colors"
+                    className="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-medium transition-colors"
                   >
                     Save Changes
                   </button>
@@ -374,19 +374,19 @@ const Profile = () => {
           </div>
 
           {/* Activity Summary */}
-          <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 shadow-lg border border-blue-200 dark:border-blue-800">
+          <div className="bg-gradient-to-br from-red-50 to-pink-50 dark:from-gray-900 dark:to-black rounded-xl p-6 shadow-lg border border-red-200 dark:border-gray-900">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Activity Summary</h3>
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalTasks}</div>
+                <div className="text-3xl font-bold text-red-600 dark:text-red-400">{stats.totalTasks}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Tasks</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.completedTasks}</div>
+                <div className="text-3xl font-bold text-red-600 dark:text-red-400">{stats.completedTasks}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Completed</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.completionRate}%</div>
+                <div className="text-3xl font-bold text-red-600 dark:text-red-400">{stats.completionRate}%</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Success Rate</div>
               </div>
             </div>

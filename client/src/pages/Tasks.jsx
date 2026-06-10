@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { FiPlus, FiEdit2, FiTrash2, FiX } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch } from 'react-icons/fi';
 import { getTasks, addTask, updateTask, deleteTask } from '../utils/localStorage';
 import toast from 'react-hot-toast';
 
 const Tasks = () => {
   const { user } = useSelector((state) => state.auth);
   const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
@@ -23,9 +25,33 @@ const Tasks = () => {
     loadTasks();
   }, []);
 
+  useEffect(() => {
+    filterTasks();
+  }, [tasks, searchQuery]);
+
   const loadTasks = () => {
     const allTasks = getTasks();
     setTasks(allTasks);
+  };
+
+  const filterTasks = () => {
+    if (!searchQuery.trim()) {
+      setFilteredTasks(tasks);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase();
+    const filtered = tasks.filter((task) => {
+      const titleMatch = task.title?.toLowerCase().includes(query);
+      const descriptionMatch = task.description?.toLowerCase().includes(query);
+      const tagsMatch = task.tags?.some(tag => tag.toLowerCase().includes(query));
+      const statusMatch = task.status?.toLowerCase().includes(query);
+      const priorityMatch = task.priority?.toLowerCase().includes(query);
+      
+      return titleMatch || descriptionMatch || tagsMatch || statusMatch || priorityMatch;
+    });
+
+    setFilteredTasks(filtered);
   };
 
   const handleSubmit = (e) => {
@@ -96,43 +122,72 @@ const Tasks = () => {
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high': return 'text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'low': return 'text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-200';
+      case 'medium': return 'text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-200';
+      case 'low': return 'text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-200';
       default: return 'text-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200';
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'done': return 'text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-200';
-      case 'in-progress': return 'text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-200';
-      case 'todo': return 'text-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200';
+      case 'done': return 'text-red-800 bg-red-200 dark:bg-red-800 dark:text-red-200';
+      case 'in-progress': return 'text-red-700 bg-red-100 dark:bg-red-900 dark:text-red-300';
+      case 'todo': return 'text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400';
       default: return 'text-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200';
     }
   };
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tasks</h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          <FiPlus /> New Task
-        </button>
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tasks</h1>
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+          >
+            <FiPlus /> New Task
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-lg px-4 py-3 shadow-sm border border-gray-200 dark:border-gray-700">
+          <FiSearch className="text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Search tasks by title, description, tags, status, or priority..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-transparent border-none outline-none text-sm text-gray-700 dark:text-gray-300 w-full placeholder-gray-400"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <FiX size={18} />
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Search Results Info */}
+      {searchQuery && (
+        <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          Found {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''} matching "{searchQuery}"
+        </div>
+      )}
 
       {/* Tasks Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tasks.map((task) => (
+        {filteredTasks.map((task) => (
           <div key={task.id} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{task.title}</h3>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleEdit(task)}
-                  className="text-blue-600 hover:text-blue-700"
+                  className="text-red-600 hover:text-red-700"
                 >
                   <FiEdit2 size={18} />
                 </button>
@@ -173,6 +228,12 @@ const Tasks = () => {
           </div>
         ))}
       </div>
+
+      {filteredTasks.length === 0 && tasks.length > 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-600 dark:text-gray-400">No tasks found matching your search.</p>
+        </div>
+      )}
 
       {tasks.length === 0 && (
         <div className="text-center py-12">
@@ -262,7 +323,7 @@ const Tasks = () => {
               <div className="flex gap-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                  className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700"
                 >
                   {editingTask ? 'Update' : 'Create'}
                 </button>

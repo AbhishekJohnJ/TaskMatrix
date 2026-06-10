@@ -109,13 +109,10 @@ app.use(errorHandler);
 // MongoDB connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('✅ MongoDB connected successfully');
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('MongoDB connected successfully');
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error.message);
+    console.error('MongoDB connection error:', error.message);
     process.exit(1);
   }
 };
@@ -127,8 +124,8 @@ const startServer = async () => {
   await connectDB();
   
   server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
-    console.log(`📡 Socket.IO server ready`);
+    console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+    console.log(`Socket.IO server ready`);
   });
 };
 
@@ -136,13 +133,13 @@ startServer();
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
-  console.error('❌ Unhandled Rejection:', err.message);
+  console.error('Unhandled Rejection:', err.message);
   server.close(() => process.exit(1));
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
-  console.error('❌ Uncaught Exception:', err.message);
+  console.error('Uncaught Exception:', err.message);
   process.exit(1);
 });
 

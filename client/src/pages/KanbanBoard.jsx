@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { HiPlus, HiPencil, HiTrash, HiClock, HiExclamation, HiClipboardList, HiLightningBolt, HiCheckCircle } from 'react-icons/hi';
+import { HiPlus, HiPencil, HiTrash, HiClock, HiExclamation, HiClipboardList, HiLightningBolt, HiCheckCircle, HiSearch, HiX } from 'react-icons/hi';
 import { getTasks, updateTask, addTask, deleteTask } from '../utils/localStorage';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ const KanbanBoard = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [newTaskColumn, setNewTaskColumn] = useState('todo');
   const [filter, setFilter] = useState('all'); // all, high, medium, low
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -23,14 +24,28 @@ const KanbanBoard = () => {
 
   useEffect(() => {
     loadTasks();
-  }, [filter]);
+  }, [filter, searchQuery]);
 
   const loadTasks = () => {
     let allTasks = getTasks();
     
-    // Apply filter
+    // Apply priority filter
     if (filter !== 'all') {
       allTasks = allTasks.filter(t => t.priority === filter);
+    }
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      allTasks = allTasks.filter((task) => {
+        const titleMatch = task.title?.toLowerCase().includes(query);
+        const descriptionMatch = task.description?.toLowerCase().includes(query);
+        const tagsMatch = task.tags?.some(tag => tag.toLowerCase().includes(query));
+        const statusMatch = task.status?.toLowerCase().includes(query);
+        const priorityMatch = task.priority?.toLowerCase().includes(query);
+        
+        return titleMatch || descriptionMatch || tagsMatch || statusMatch || priorityMatch;
+      });
     }
     
     const grouped = {
@@ -128,8 +143,8 @@ const KanbanBoard = () => {
   const getPriorityBadgeColor = (priority) => {
     switch (priority) {
       case 'high': return 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'low': return 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-200';
+      case 'medium': return 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-200';
+      case 'low': return 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-200';
       default: return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-200';
     }
   };
@@ -140,9 +155,9 @@ const KanbanBoard = () => {
   };
 
   const columns = [
-    { id: 'todo', title: 'To Do', bgColor: 'bg-gray-100 dark:bg-gray-700', icon: HiClipboardList, iconColor: 'text-gray-600 dark:text-gray-400' },
-    { id: 'in-progress', title: 'In Progress', bgColor: 'bg-blue-100 dark:bg-blue-900', icon: HiLightningBolt, iconColor: 'text-blue-600 dark:text-blue-400' },
-    { id: 'done', title: 'Done', bgColor: 'bg-green-100 dark:bg-green-900', icon: HiCheckCircle, iconColor: 'text-green-600 dark:text-green-400' },
+    { id: 'todo', title: 'To Do', bgColor: 'bg-red-50 dark:bg-red-950', icon: HiClipboardList, iconColor: 'text-red-600 dark:text-red-400' },
+    { id: 'in-progress', title: 'In Progress', bgColor: 'bg-red-100 dark:bg-red-900', icon: HiLightningBolt, iconColor: 'text-red-700 dark:text-red-300' },
+    { id: 'done', title: 'Done', bgColor: 'bg-red-200 dark:bg-red-800', icon: HiCheckCircle, iconColor: 'text-red-800 dark:text-red-200' },
   ];
 
   const totalTasks = tasks.todo.length + tasks['in-progress'].length + tasks.done.length;
@@ -151,21 +166,22 @@ const KanbanBoard = () => {
   return (
     <div>
       {/* Header with filters */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Kanban Board</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            {totalTasks} tasks • {completionRate}% complete
-          </p>
-        </div>
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Kanban Board</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {totalTasks} tasks • {completionRate}% complete
+            </p>
+          </div>
 
-        {/* Filter buttons */}
-        <div className="flex gap-2">
+          {/* Filter buttons */}
+          <div className="flex gap-2">
           <button
             onClick={() => setFilter('all')}
             className={`px-4 py-2 rounded-lg font-medium ${
               filter === 'all'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-red-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
             }`}
           >
@@ -185,7 +201,7 @@ const KanbanBoard = () => {
             onClick={() => setFilter('medium')}
             className={`px-4 py-2 rounded-lg font-medium ${
               filter === 'medium'
-                ? 'bg-yellow-600 text-white'
+                ? 'bg-red-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
             }`}
           >
@@ -195,13 +211,41 @@ const KanbanBoard = () => {
             onClick={() => setFilter('low')}
             className={`px-4 py-2 rounded-lg font-medium ${
               filter === 'low'
-                ? 'bg-green-600 text-white'
+                ? 'bg-red-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
             }`}
           >
             Low
           </button>
+          </div>
         </div>
+
+        {/* Search Bar */}
+        <div className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-lg px-4 py-3 shadow-sm border border-gray-200 dark:border-gray-700">
+          <HiSearch className="text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Search tasks by title, description, tags, status, or priority..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-transparent border-none outline-none text-sm text-gray-700 dark:text-gray-300 w-full placeholder-gray-400"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <HiX size={18} />
+            </button>
+          )}
+        </div>
+
+        {/* Search Results Info */}
+        {searchQuery && (
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Found {totalTasks} task{totalTasks !== 1 ? 's' : ''} matching "{searchQuery}"
+          </div>
+        )}
       </div>
 
       {/* Kanban columns */}

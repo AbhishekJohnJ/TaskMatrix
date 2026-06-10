@@ -8,7 +8,7 @@ import {
   HiHome, HiClipboardList, HiViewBoards, HiCalendar, 
   HiChartBar, HiInformationCircle, HiUser, HiCog, 
   HiLogout, HiMenuAlt2, HiX, HiSun, HiMoon, 
-  HiBell, HiSearch, HiChevronLeft, HiChevronRight 
+  HiBell, HiChevronLeft, HiChevronRight 
 } from 'react-icons/hi';
 
 const DashboardLayout = () => {
@@ -52,9 +52,9 @@ const DashboardLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-black dark:to-gray-900">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-lg fixed w-full top-0 z-30 border-b border-gray-200 dark:border-gray-700">
+      <header className="bg-white dark:bg-black shadow-lg fixed w-full top-0 z-30 border-b border-gray-200 dark:border-gray-900">
         <div className="flex items-center justify-between px-4 lg:px-6 py-3">
           <div className="flex items-center gap-4">
             {/* Mobile menu toggle */}
@@ -75,26 +75,16 @@ const DashboardLayout = () => {
 
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
                 <span className="text-white font-bold text-lg">T</span>
               </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
                 TaskMatrix
               </h1>
             </div>
           </div>
           
           <div className="flex items-center gap-2 md:gap-4">
-            {/* Search bar - hidden on mobile */}
-            <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-2 w-64">
-              <HiSearch className="text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="bg-transparent border-none outline-none text-sm text-gray-700 dark:text-gray-300 w-full"
-              />
-            </div>
-
             {/* Notifications */}
             <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <HiBell className="text-gray-600 dark:text-gray-300" size={20} />
@@ -130,7 +120,7 @@ const DashboardLayout = () => {
                   className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white font-semibold">
                   {user?.fullName?.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -141,8 +131,8 @@ const DashboardLayout = () => {
 
       {/* Sidebar - Desktop */}
       <aside className={`
-        hidden lg:block fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white dark:bg-gray-800 shadow-xl z-20
-        transition-all duration-300 ease-in-out border-r border-gray-200 dark:border-gray-700
+        hidden lg:block fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white dark:bg-black shadow-xl z-20
+        transition-all duration-300 ease-in-out border-r border-gray-200 dark:border-gray-900
         ${sidebarOpen ? 'w-64' : 'w-20'}
       `}>
         <nav className="h-full flex flex-col p-4 space-y-2 overflow-y-auto">
@@ -157,8 +147,8 @@ const DashboardLayout = () => {
                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-xl transition-all group relative
                   ${isActive 
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900'
                   }
                   ${!sidebarOpen ? 'justify-center' : ''}
                 `}
@@ -224,8 +214,8 @@ const DashboardLayout = () => {
 
       {/* Sidebar - Mobile */}
       <aside className={`
-        lg:hidden fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-gray-800 shadow-xl z-20
-        transform transition-transform duration-300 ease-in-out border-r border-gray-200 dark:border-gray-700
+        lg:hidden fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-black shadow-xl z-20
+        transform transition-transform duration-300 ease-in-out border-r border-gray-200 dark:border-gray-900
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <nav className="h-full flex flex-col p-4 space-y-2 overflow-y-auto">
@@ -240,8 +230,8 @@ const DashboardLayout = () => {
                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-xl transition-all
                   ${isActive 
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900'
                   }
                 `}
               >
