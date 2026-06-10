@@ -151,7 +151,7 @@ const Tasks = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-lg px-4 py-3 shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3 bg-white dark:bg-black rounded-lg px-4 py-3 shadow-sm border border-gray-200 dark:border-red-600">
           <FiSearch className="text-gray-400" size={20} />
           <input
             type="text"
@@ -181,7 +181,7 @@ const Tasks = () => {
       {/* Tasks Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredTasks.map((task) => (
-          <div key={task.id} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+          <div key={task.id} className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{task.title}</h3>
               <div className="flex gap-2">
@@ -218,7 +218,7 @@ const Tasks = () => {
                 {task.tags.map((tag, idx) => (
                   <span
                     key={idx}
-                    className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs"
+                    className="px-2 py-1 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 rounded text-xs"
                   >
                     #{tag}
                   </span>
@@ -244,7 +244,7 @@ const Tasks = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full">
+          <div className="bg-white dark:bg-black rounded-xl p-6 max-w-md w-full dark:border dark:border-red-600">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
               {editingTask ? 'Edit Task' : 'New Task'}
             </h2>
@@ -259,7 +259,7 @@ const Tasks = () => {
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                 />
               </div>
 
@@ -271,7 +271,7 @@ const Tasks = () => {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows="3"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                 />
               </div>
 
@@ -283,7 +283,7 @@ const Tasks = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                   >
                     <option value="todo">To Do</option>
                     <option value="in-progress">In Progress</option>
@@ -298,7 +298,7 @@ const Tasks = () => {
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -316,7 +316,7 @@ const Tasks = () => {
                   value={formData.tags}
                   onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                   placeholder="work, urgent, bug"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                 />
               </div>
 
@@ -330,7 +330,7 @@ const Tasks = () => {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+                  className="flex-1 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-950"
                 >
                   Cancel
                 </button>
@@ -343,7 +343,7 @@ const Tasks = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full">
+          <div className="bg-white dark:bg-black rounded-xl p-6 max-w-md w-full dark:border dark:border-red-600">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Delete Task</h2>
               <button
@@ -367,7 +367,7 @@ const Tasks = () => {
               </button>
               <button
                 onClick={cancelDelete}
-                className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium"
+                className="flex-1 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-950 font-medium"
               >
                 Cancel
               </button>

@@ -23,7 +23,6 @@ import TeamDetail from './pages/TeamDetail';
 import Analytics from './pages/Analytics';
 import About from './pages/About';
 import Profile from './pages/Profile';
-import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 
 // Protected Route Component
@@ -96,12 +95,13 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/tasks/:id" element={<TaskDetail />} />
+        <Route path="/teams" element={<Teams />} />
+        <Route path="/teams/:id" element={<TeamDetail />} />
         <Route path="/kanban" element={<KanbanBoard />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
       </Route>
 
       {/* 404 */}

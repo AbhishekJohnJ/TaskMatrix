@@ -64,6 +64,65 @@ export const getUserByEmail = (email) => {
   return users.find(u => u.email === email);
 };
 
+export const getUserById = (userId) => {
+  const users = getUsers();
+  return users.find(u => u.id === userId);
+};
+
+export const updateUserPassword = (email, newPassword) => {
+  const users = getUsers();
+  const userIndex = users.findIndex(u => u.email === email);
+  
+  if (userIndex >= 0) {
+    users[userIndex].password = newPassword;
+    users[userIndex].updatedAt = new Date().toISOString();
+    setToStorage(STORAGE_KEYS.USERS, users);
+    return true;
+  }
+  return false;
+};
+
+export const createPasswordResetToken = (email) => {
+  const user = getUserByEmail(email);
+  if (!user) return null;
+  
+  // Create a simple token (in production, this would be more secure)
+  const token = btoa(`${email}:${Date.now()}`);
+  const resetTokens = getFromStorage('taskmatrix_reset_tokens') || {};
+  
+  // Token expires in 1 hour
+  resetTokens[token] = {
+    email,
+    expiresAt: Date.now() + 3600000, // 1 hour
+  };
+  
+  setToStorage('taskmatrix_reset_tokens', resetTokens);
+  return token;
+};
+
+export const validatePasswordResetToken = (token) => {
+  const resetTokens = getFromStorage('taskmatrix_reset_tokens') || {};
+  const tokenData = resetTokens[token];
+  
+  if (!tokenData) return null;
+  
+  // Check if token has expired
+  if (Date.now() > tokenData.expiresAt) {
+    // Remove expired token
+    delete resetTokens[token];
+    setToStorage('taskmatrix_reset_tokens', resetTokens);
+    return null;
+  }
+  
+  return tokenData.email;
+};
+
+export const removePasswordResetToken = (token) => {
+  const resetTokens = getFromStorage('taskmatrix_reset_tokens') || {};
+  delete resetTokens[token];
+  setToStorage('taskmatrix_reset_tokens', resetTokens);
+};
+
 export const getCurrentUser = () => {
   return getFromStorage(STORAGE_KEYS.CURRENT_USER);
 };

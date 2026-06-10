@@ -4,9 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
 import { useTheme } from '../hooks/useTheme';
 import { clearCurrentUser } from '../utils/localStorage';
+import Logo from '../components/Logo';
 import { 
   HiHome, HiClipboardList, HiViewBoards, HiCalendar, 
-  HiChartBar, HiInformationCircle, HiUser, HiCog, 
+  HiChartBar, HiInformationCircle, HiUser, HiUserGroup,
   HiLogout, HiMenuAlt2, HiX, HiSun, HiMoon, 
   HiBell, HiChevronLeft, HiChevronRight 
 } from 'react-icons/hi';
@@ -45,6 +46,7 @@ const DashboardLayout = () => {
   const menuItems = [
     { path: '/dashboard', icon: HiHome, label: 'Dashboard' },
     { path: '/tasks', icon: HiClipboardList, label: 'Tasks' },
+    { path: '/teams', icon: HiUserGroup, label: 'Teams' },
     { path: '/kanban', icon: HiViewBoards, label: 'Kanban' },
     { path: '/calendar', icon: HiCalendar, label: 'Calendar' },
     { path: '/analytics', icon: HiChartBar, label: 'Analytics' },
@@ -75,9 +77,7 @@ const DashboardLayout = () => {
 
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
+              <Logo size={32} />
               <h1 className="text-xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
                 TaskMatrix
               </h1>
@@ -182,19 +182,6 @@ const DashboardLayout = () => {
                 </span>
               )}
             </Link>
-            <Link
-              to="/settings"
-              title={!sidebarOpen ? 'Settings' : ''}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all group relative ${!sidebarOpen ? 'justify-center' : ''}`}
-            >
-              <HiCog size={22} className="flex-shrink-0" />
-              {sidebarOpen && <span className="font-medium">Settings</span>}
-              {!sidebarOpen && (
-                <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                  Settings
-                </span>
-              )}
-            </Link>
             <button
               onClick={handleLogout}
               title={!sidebarOpen ? 'Logout' : ''}
@@ -247,18 +234,10 @@ const DashboardLayout = () => {
             <Link
               to="/profile"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all"
             >
               <HiUser size={22} />
               <span className="font-medium">Profile</span>
-            </Link>
-            <Link
-              to="/settings"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
-            >
-              <HiCog size={22} />
-              <span className="font-medium">Settings</span>
             </Link>
             <button
               onClick={() => {

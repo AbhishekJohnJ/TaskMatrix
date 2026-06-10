@@ -182,7 +182,7 @@ const KanbanBoard = () => {
             className={`px-4 py-2 rounded-lg font-medium ${
               filter === 'all'
                 ? 'bg-red-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                : 'bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300'
             }`}
           >
             All
@@ -192,7 +192,7 @@ const KanbanBoard = () => {
             className={`px-4 py-2 rounded-lg font-medium ${
               filter === 'high'
                 ? 'bg-red-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                : 'bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300'
             }`}
           >
             High
@@ -202,7 +202,7 @@ const KanbanBoard = () => {
             className={`px-4 py-2 rounded-lg font-medium ${
               filter === 'medium'
                 ? 'bg-red-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                : 'bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300'
             }`}
           >
             Medium
@@ -212,7 +212,7 @@ const KanbanBoard = () => {
             className={`px-4 py-2 rounded-lg font-medium ${
               filter === 'low'
                 ? 'bg-red-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                : 'bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300'
             }`}
           >
             Low
@@ -221,7 +221,7 @@ const KanbanBoard = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-lg px-4 py-3 shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3 bg-white dark:bg-black rounded-lg px-4 py-3 shadow-sm border border-gray-200 dark:border-red-600">
           <HiSearch className="text-gray-400" size={20} />
           <input
             type="text"
@@ -281,7 +281,7 @@ const KanbanBoard = () => {
                   draggable
                   onDragStart={(e) => handleDragStart(e, task)}
                   onDragEnd={handleDragEnd}
-                  className={`bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm cursor-move hover:shadow-md transition-all ${getPriorityColor(task.priority)}`}
+                  className={`bg-white dark:bg-black rounded-lg p-4 shadow-sm cursor-move hover:shadow-md transition-all dark:border dark:border-red-900 ${getPriorityColor(task.priority)}`}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-semibold text-gray-900 dark:text-white flex-1">{task.title}</h3>
@@ -338,7 +338,7 @@ const KanbanBoard = () => {
                       {task.tags.map((tag, idx) => (
                         <span
                           key={idx}
-                          className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded"
+                          className="text-xs bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded"
                         >
                           #{tag}
                         </span>
@@ -395,7 +395,7 @@ const KanbanBoard = () => {
 // Task Form Modal Component
 const TaskFormModal = ({ title, formData, setFormData, onSubmit, onClose, isEdit }) => (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="bg-white dark:bg-black rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto dark:border dark:border-red-600">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{title}</h2>
 
       <form onSubmit={onSubmit} className="space-y-4">
@@ -408,7 +408,7 @@ const TaskFormModal = ({ title, formData, setFormData, onSubmit, onClose, isEdit
             required
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
             placeholder="Enter task title"
           />
         </div>
@@ -421,7 +421,7 @@ const TaskFormModal = ({ title, formData, setFormData, onSubmit, onClose, isEdit
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows="3"
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
             placeholder="Enter task description"
           />
         </div>
@@ -434,7 +434,7 @@ const TaskFormModal = ({ title, formData, setFormData, onSubmit, onClose, isEdit
             <select
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -450,7 +450,7 @@ const TaskFormModal = ({ title, formData, setFormData, onSubmit, onClose, isEdit
               type="date"
               value={formData.dueDate}
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
             />
           </div>
         </div>
@@ -463,7 +463,7 @@ const TaskFormModal = ({ title, formData, setFormData, onSubmit, onClose, isEdit
             type="text"
             value={formData.tags}
             onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
             placeholder="urgent, bug, feature"
           />
         </div>
@@ -478,7 +478,7 @@ const TaskFormModal = ({ title, formData, setFormData, onSubmit, onClose, isEdit
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium"
+            className="flex-1 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-950 font-medium"
           >
             Cancel
           </button>

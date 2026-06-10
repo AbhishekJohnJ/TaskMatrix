@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/slices/authSlice';
 import toast from 'react-hot-toast';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiMail, FiLock, FiUser } from 'react-icons/fi';
 import { saveUser, setCurrentUser, getUserByEmail, initializeDemoData } from '../../utils/localStorage';
 
 const Register = () => {
@@ -86,110 +86,156 @@ const Register = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-        Create Account
-      </h2>
+    <div className="bg-white dark:bg-black rounded-2xl shadow-2xl p-6 border border-gray-100 dark:border-red-900">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+          Create Account
+        </h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Join TaskMatrix and boost your productivity</p>
+      </div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
             Full Name
           </label>
-          <input
-            type="text"
-            required
-            value={formData.fullName}
-            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FiUser className="text-gray-400" size={18} />
+            </div>
+            <input
+              type="text"
+              required
+              value={formData.fullName}
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-black dark:text-white transition-all text-sm"
+              placeholder="John Doe"
+            />
+          </div>
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
             Username
           </label>
-          <input
-            type="text"
-            required
-            value={formData.username}
-            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-400 font-medium text-sm">@</span>
+            </div>
+            <input
+              type="text"
+              required
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-black dark:text-white transition-all text-sm"
+              placeholder="johndoe"
+            />
+          </div>
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Email
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+            Email Address
           </label>
-          <input
-            type="email"
-            required
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FiMail className="text-gray-400" size={18} />
+            </div>
+            <input
+              type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-black dark:text-white transition-all text-sm"
+              placeholder="john@example.com"
+            />
+          </div>
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
             Password
           </label>
           <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FiLock className="text-gray-400" size={18} />
+            </div>
             <input
               type={showPassword ? "text" : "password"}
               required
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-black dark:text-white transition-all text-sm"
+              placeholder="••••••••"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
             >
-              {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
             </button>
           </div>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Must be at least 6 characters</p>
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
             Confirm Password
           </label>
           <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FiLock className="text-gray-400" size={18} />
+            </div>
             <input
               type={showConfirmPassword ? "text" : "password"}
               required
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              className="w-full px-4 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-black dark:text-white transition-all text-sm"
+              placeholder="••••••••"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
             >
-              {showConfirmPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              {showConfirmPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
             </button>
           </div>
         </div>
-        
+
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+          className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-2.5 rounded-xl hover:from-red-700 hover:to-red-800 disabled:opacity-50 font-semibold shadow-lg shadow-red-500/30 transition-all transform hover:scale-[1.02] active:scale-[0.98] text-sm"
         >
-          {loading ? 'Creating Account...' : 'Create Account'}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Creating Account...
+            </span>
+          ) : (
+            'Create Account'
+          )}
         </button>
-      </form>
-      
-      <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-        Already have an account?{' '}
-        <Link to="/login" className="text-blue-600 hover:text-blue-500 font-medium">
-          Sign In
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="px-3 bg-white dark:bg-black text-gray-500">Already have an account?</span>
+          </div>
+        </div>
+
+        <Link 
+          to="/login"
+          className="block w-full text-center py-2.5 px-4 border-2 border-red-600 dark:border-red-700 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-50 dark:hover:bg-red-950 font-semibold transition-all transform hover:scale-[1.02] active:scale-[0.98] text-sm"
+        >
+          Sign In Instead
         </Link>
-      </p>
+      </form>
     </div>
   );
 };

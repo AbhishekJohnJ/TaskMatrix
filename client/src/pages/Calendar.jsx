@@ -199,13 +199,13 @@ const Calendar = () => {
       </div>
 
       {/* Calendar Grid */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-black rounded-xl shadow-sm overflow-hidden dark:border dark:border-red-600">
         {/* Week days header */}
         <div className="grid grid-cols-7 border-b dark:border-gray-700">
           {weekDays.map((day) => (
             <div
               key={day}
-              className="p-4 text-center font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50"
+              className="p-4 text-center font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-black"
             >
               {day}
             </div>
@@ -272,21 +272,21 @@ const Calendar = () => {
 
       {/* Task Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Tasks</p>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">{tasks.length}</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">With Due Date</p>
           <p className="text-3xl font-bold text-blue-600">{tasks.filter(t => t.dueDate).length}</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Overdue</p>
           <p className="text-3xl font-bold text-red-600">
             {tasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'done').length}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Month</p>
           <p className="text-3xl font-bold text-green-600">
             {tasks.filter(t => {
@@ -304,7 +304,7 @@ const Calendar = () => {
       {/* Create Task Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full">
+          <div className="bg-white dark:bg-black rounded-xl p-6 max-w-md w-full dark:border dark:border-red-600">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Create Task
@@ -324,7 +324,7 @@ const Calendar = () => {
                   required
                   value={formData.dueDate}
                   onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                 />
               </div>
 
@@ -337,7 +337,7 @@ const Calendar = () => {
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                   placeholder="Enter task title"
                 />
               </div>
@@ -350,7 +350,7 @@ const Calendar = () => {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows="3"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                   placeholder="Enter task description"
                 />
               </div>
@@ -363,7 +363,7 @@ const Calendar = () => {
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -378,7 +378,7 @@ const Calendar = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
                   >
                     <option value="todo">To Do</option>
                     <option value="in-progress">In Progress</option>
@@ -397,7 +397,7 @@ const Calendar = () => {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium"
+                  className="flex-1 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-950 font-medium"
                 >
                   Cancel
                 </button>
@@ -410,7 +410,7 @@ const Calendar = () => {
       {/* Task Details Modal */}
       {showTaskDetails && selectedTask && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full">
+          <div className="bg-white dark:bg-black rounded-xl p-6 max-w-md w-full dark:border dark:border-red-600">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Task Details
@@ -463,7 +463,7 @@ const Calendar = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleUpdateStatus('todo')}
-                    className="flex-1 py-2 px-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg text-sm font-medium"
+                    className="flex-1 py-2 px-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-900 dark:hover:bg-gray-950 rounded-lg text-sm font-medium"
                   >
                     To Do
                   </button>

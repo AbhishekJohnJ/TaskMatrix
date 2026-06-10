@@ -203,21 +203,21 @@ const Profile = () => {
 
             {/* Quick Stats */}
             <div className="space-y-3 pt-6 border-t border-gray-200 dark:border-gray-700 flex-1">
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-black rounded-lg dark:border dark:border-red-900">
                 <div className="flex items-center gap-2">
                   <HiCheckCircle className="text-red-500" size={20} />
                   <span className="text-sm text-gray-600 dark:text-gray-400">Completed</span>
                 </div>
                 <span className="font-bold text-gray-900 dark:text-white">{stats.completedTasks}</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-black rounded-lg dark:border dark:border-red-900">
                 <div className="flex items-center gap-2">
                   <HiClock className="text-red-500" size={20} />
                   <span className="text-sm text-gray-600 dark:text-gray-400">In Progress</span>
                 </div>
                 <span className="font-bold text-gray-900 dark:text-white">{stats.inProgressTasks}</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-black rounded-lg dark:border dark:border-red-900">
                 <div className="flex items-center gap-2">
                   <HiTrendingUp className="text-red-500" size={20} />
                   <span className="text-sm text-gray-600 dark:text-gray-400">Success Rate</span>
@@ -261,7 +261,7 @@ const Profile = () => {
                         required
                         value={formData.fullName}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:text-white"
                         placeholder="Enter your full name"
                       />
                     </div>
@@ -281,7 +281,7 @@ const Profile = () => {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:text-white"
                         placeholder="Enter your email"
                       />
                     </div>
@@ -297,7 +297,7 @@ const Profile = () => {
                     value={formData.bio}
                     onChange={handleChange}
                     rows="4"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:text-white"
                     placeholder="Tell us about yourself..."
                   />
                 </div>
@@ -312,7 +312,7 @@ const Profile = () => {
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition-colors"
+                    className="flex-1 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-950 font-medium transition-colors"
                   >
                     Cancel
                   </button>

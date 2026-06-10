@@ -71,7 +71,7 @@ const Analytics = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-lg border-2 border-gray-200 dark:border-red-600">
           <div className="flex items-center justify-between mb-3">
             <span className="text-gray-600 dark:text-gray-400 text-sm font-medium">Completion Rate</span>
             <div className={`px-3 py-1 rounded-full text-xs font-bold ${
@@ -85,7 +85,7 @@ const Analytics = () => {
           <div className="flex items-end gap-2 mb-3">
             <span className="text-4xl font-bold text-gray-900 dark:text-white">{analytics.completionRate}%</span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+          <div className="w-full bg-gray-200 dark:bg-black rounded-full h-3 border dark:border-red-900">
             <div
               className={`h-3 rounded-full transition-all duration-500 ${
                 analytics.completionRate >= 70 ? 'bg-gradient-to-r from-green-500 to-green-600' :
@@ -97,7 +97,7 @@ const Analytics = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-green-200 dark:border-green-800">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-lg border-2 border-green-200 dark:border-red-600">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900 flex items-center justify-center">
               <HiCheckCircle className="text-green-600 dark:text-green-400" size={28} />
@@ -110,7 +110,7 @@ const Analytics = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-blue-200 dark:border-blue-800">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-lg border-2 border-blue-200 dark:border-red-600">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
               <HiClock className="text-blue-600 dark:text-blue-400" size={28} />
@@ -122,7 +122,7 @@ const Analytics = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-red-200 dark:border-red-800">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-lg border-2 border-red-200 dark:border-red-600">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900 flex items-center justify-center">
               <HiExclamation className="text-red-600 dark:text-red-400" size={28} />
@@ -138,7 +138,7 @@ const Analytics = () => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Task Status Bar Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-lg border border-gray-200 dark:border-red-600">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Task Status Distribution</h3>
           <div className="space-y-6">
             <div>
@@ -150,7 +150,7 @@ const Analytics = () => {
                 <span className="text-lg font-bold text-gray-900 dark:text-white">{analytics.completed}</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-8">
+                <div className="flex-1 bg-gray-200 dark:bg-black rounded-full h-8 border dark:border-red-900">
                   <div
                     className="bg-gradient-to-r from-green-500 to-green-600 h-8 rounded-full transition-all duration-500 flex items-center justify-end pr-3"
                     style={{ width: `${(analytics.completed / maxValue) * 100}%` }}
@@ -172,7 +172,7 @@ const Analytics = () => {
                 <span className="text-lg font-bold text-gray-900 dark:text-white">{analytics.inProgress}</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-8">
+                <div className="flex-1 bg-gray-200 dark:bg-black rounded-full h-8 border dark:border-red-900">
                   <div
                     className="bg-gradient-to-r from-blue-500 to-blue-600 h-8 rounded-full transition-all duration-500 flex items-center justify-end pr-3"
                     style={{ width: `${(analytics.inProgress / maxValue) * 100}%` }}
@@ -194,7 +194,7 @@ const Analytics = () => {
                 <span className="text-lg font-bold text-gray-900 dark:text-white">{analytics.todo}</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-8">
+                <div className="flex-1 bg-gray-200 dark:bg-black rounded-full h-8 border dark:border-red-900">
                   <div
                     className="bg-gradient-to-r from-gray-400 to-gray-500 h-8 rounded-full transition-all duration-500 flex items-center justify-end pr-3"
                     style={{ width: `${(analytics.todo / maxValue) * 100}%` }}
@@ -210,7 +210,7 @@ const Analytics = () => {
         </div>
 
         {/* Priority Distribution Bar Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-lg border border-gray-200 dark:border-red-600">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Priority Distribution</h3>
           <div className="space-y-6">
             <div>
@@ -222,7 +222,7 @@ const Analytics = () => {
                 <span className="text-lg font-bold text-gray-900 dark:text-white">{analytics.highPriority}</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-8">
+                <div className="flex-1 bg-gray-200 dark:bg-black rounded-full h-8 border dark:border-red-900">
                   <div
                     className="bg-gradient-to-r from-red-500 to-red-600 h-8 rounded-full transition-all duration-500 flex items-center justify-end pr-3"
                     style={{ width: `${(analytics.highPriority / maxPriorityValue) * 100}%` }}
@@ -244,7 +244,7 @@ const Analytics = () => {
                 <span className="text-lg font-bold text-gray-900 dark:text-white">{analytics.mediumPriority}</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-8">
+                <div className="flex-1 bg-gray-200 dark:bg-black rounded-full h-8 border dark:border-red-900">
                   <div
                     className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-8 rounded-full transition-all duration-500 flex items-center justify-end pr-3"
                     style={{ width: `${(analytics.mediumPriority / maxPriorityValue) * 100}%` }}
@@ -311,14 +311,14 @@ const Analytics = () => {
         </div>
 
         {/* Actionable Insights */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-lg border border-gray-200 dark:border-red-600">
           <div className="flex items-center gap-3 mb-4">
             <HiFlag className="text-purple-500" size={32} />
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Insights & Recommendations</h3>
           </div>
           <div className="space-y-3">
             {analytics.total === 0 ? (
-              <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-black rounded-lg dark:border dark:border-red-900">
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-white">Get Started</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Create your first task to start tracking productivity.</p>

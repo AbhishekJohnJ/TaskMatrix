@@ -63,7 +63,7 @@ const About = () => {
           return (
             <div
               key={index}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500"
+              className="bg-white dark:bg-black rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 dark:border-red-600 hover:border-blue-500 dark:hover:border-blue-500"
             >
               <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-5`}>
                 <Icon className="text-white" size={32} />
@@ -80,7 +80,7 @@ const About = () => {
       </div>
 
       {/* Key Highlights Section */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 md:p-12 border border-gray-200 dark:border-gray-600 mb-16">
+      <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-black dark:to-black rounded-2xl p-8 md:p-12 border border-gray-200 dark:border-red-600 mb-16 dark:shadow-[0_0_15px_rgba(220,38,38,0.3)]">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
           Why Choose TaskMatrix?
         </h2>

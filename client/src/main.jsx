@@ -30,21 +30,34 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#363636',
-                color: '#fff',
+                borderRadius: '12px',
+                fontWeight: '600',
+                fontSize: '15px',
+                padding: '16px 20px',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2)',
               },
               success: {
                 duration: 3000,
+                style: {
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: '#ffffff',
+                  border: '2px solid #10b981',
+                },
                 iconTheme: {
-                  primary: '#10b981',
-                  secondary: '#fff',
+                  primary: '#ffffff',
+                  secondary: '#10b981',
                 },
               },
               error: {
                 duration: 4000,
+                style: {
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  color: '#ffffff',
+                  border: '2px solid #dc2626',
+                },
                 iconTheme: {
-                  primary: '#ef4444',
-                  secondary: '#fff',
+                  primary: '#ffffff',
+                  secondary: '#ef4444',
                 },
               },
             }}

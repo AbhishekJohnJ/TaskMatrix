@@ -11,6 +11,9 @@ const Dashboard = () => {
     inProgress: 0,
     completed: 0,
     todo: 0,
+    high: 0,
+    medium: 0,
+    low: 0,
   });
   const [recentTasks, setRecentTasks] = useState([]);
 
@@ -26,6 +29,9 @@ const Dashboard = () => {
       inProgress: tasks.filter(t => t.status === 'in-progress').length,
       completed: tasks.filter(t => t.status === 'done').length,
       todo: tasks.filter(t => t.status === 'todo').length,
+      high: tasks.filter(t => t.priority === 'high').length,
+      medium: tasks.filter(t => t.priority === 'medium').length,
+      low: tasks.filter(t => t.priority === 'low').length,
     });
 
     // Get 5 most recent tasks
@@ -67,7 +73,7 @@ const Dashboard = () => {
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div key={index} className="bg-white dark:bg-black rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow dark:border dark:border-red-600">
               <div className="flex items-center justify-between mb-4">
                 <div className={`${stat.color} p-3 rounded-lg`}>
                   <Icon className="text-white" size={24} />
@@ -83,10 +89,10 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Recent Tasks & Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Recent Tasks & Progress Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Recent Tasks */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recent Tasks</h2>
             <Link to="/tasks" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
@@ -97,12 +103,12 @@ const Dashboard = () => {
           {recentTasks.length > 0 ? (
             <div className="space-y-3">
               {recentTasks.map((task) => (
-                <div key={task.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                  <div className="flex-1">
+                <div key={task.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-black rounded-lg hover:bg-gray-100 dark:hover:bg-gray-950 transition-colors dark:border dark:border-red-900">
+                  <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{task.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">{task.description}</p>
                   </div>
-                  <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(task.status)}`}>
+                  <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusBadge(task.status)}`}>
                     {task.status.replace('-', ' ')}
                   </span>
                 </div>
@@ -118,54 +124,63 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
-          <div className="space-y-3">
-            <Link
-              to="/tasks"
-              className="block w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 text-center font-medium transition-colors"
-            >
-              Create New Task
-            </Link>
-            <Link
-              to="/kanban"
-              className="block w-full bg-red-700 text-white py-3 rounded-lg hover:bg-red-800 text-center font-medium transition-colors"
-            >
-              View Kanban Board
-            </Link>
-            <Link
-              to="/calendar"
-              className="block w-full bg-red-800 text-white py-3 rounded-lg hover:bg-red-900 text-center font-medium transition-colors"
-            >
-              Open Calendar
-            </Link>
-            <Link
-              to="/analytics"
-              className="block w-full bg-red-900 text-white py-3 rounded-lg hover:bg-red-950 text-center font-medium transition-colors"
-            >
-              View Analytics
-            </Link>
-          </div>
-
-          {/* Progress Overview */}
-          <div className="mt-6 pt-6 border-t dark:border-gray-700">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Today's Progress</h3>
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600 dark:text-gray-400">Completed</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full transition-all"
-                    style={{ width: `${stats.total > 0 ? (stats.completed / stats.total) * 100 : 0}%` }}
-                  />
-                </div>
+        {/* Progress Overview */}
+        <div className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Progress Overview</h2>
+          
+          <div className="space-y-6">
+            {/* Completion Rate */}
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-gray-600 dark:text-gray-400">Completed Tasks</span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {stats.completed} / {stats.total}
+                </span>
               </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                <div
+                  className="bg-green-500 h-3 rounded-full transition-all"
+                  style={{ width: `${stats.total > 0 ? (stats.completed / stats.total) * 100 : 0}%` }}
+                />
+              </div>
+              <div className="text-center mt-2">
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0}%
+                </span>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Completion Rate</p>
+              </div>
+            </div>
+
+            {/* Task Breakdown by Priority */}
+            <div className="pt-6 border-t dark:border-gray-700 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Low Priority</span>
+                <span className="text-sm font-semibold text-green-600 dark:text-green-400">{stats.low}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Medium Priority</span>
+                <span className="text-sm font-semibold text-yellow-600 dark:text-yellow-400">{stats.medium}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600 dark:text-gray-400">High Priority</span>
+                <span className="text-sm font-semibold text-red-600 dark:text-red-400">{stats.high}</span>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="pt-6 border-t dark:border-gray-700 space-y-2">
+              <Link
+                to="/tasks"
+                className="block w-full bg-red-600 text-white py-2.5 rounded-lg hover:bg-red-700 text-center text-sm font-medium transition-colors"
+              >
+                View All Tasks
+              </Link>
+              <Link
+                to="/kanban"
+                className="block w-full bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-2.5 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-950 text-center text-sm font-medium transition-colors"
+              >
+                Open Kanban Board
+              </Link>
             </div>
           </div>
         </div>
