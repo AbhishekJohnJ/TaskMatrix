@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/slices/authSlice';
 import toast from 'react-hot-toast';
 import { FiEye, FiEyeOff, FiMail, FiLock, FiUser } from 'react-icons/fi';
-import { saveUser, setCurrentUser, getUserByEmail, initializeDemoData } from '../../utils/localStorage';
+import { authService } from '../../services/authService';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -28,58 +28,45 @@ const Register = () => {
       return;
     }
     
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    if (formData.password.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+
+    const hasUppercase = /[A-Z]/.test(formData.password);
+    const hasLowercase = /[a-z]/.test(formData.password);
+    const hasNumber = /\d/.test(formData.password);
+    if (!hasUppercase || !hasLowercase || !hasNumber) {
+      toast.error('Password must contain at least one uppercase letter, one lowercase letter, and one number');
       return;
     }
     
     setLoading(true);
     
     try {
-      // Check if user already exists
-      const existingUser = getUserByEmail(formData.email);
-      if (existingUser) {
-        toast.error('Email already registered');
-        setLoading(false);
-        return;
-      }
-      
-      // Create new user
-      const newUser = {
-        id: Date.now().toString(),
+      const data = await authService.register({
         fullName: formData.fullName,
         username: formData.username,
         email: formData.email,
-        password: formData.password, // In production, this should be hashed
-        role: 'user',
-        profilePicture: null,
-        createdAt: new Date().toISOString(),
-      };
-      
-      // Save user to localStorage
-      saveUser(newUser);
-      
-      // Set as current user
-      const userWithoutPassword = { ...newUser };
-      delete userWithoutPassword.password;
-      setCurrentUser(userWithoutPassword);
-      
-      const mockToken = 'token-' + newUser.id;
-      localStorage.setItem('token', mockToken);
-      
-      // Update Redux state
-      dispatch(setUser({
-        user: userWithoutPassword,
-        token: mockToken
-      }));
-      
-      // Initialize demo data
-      initializeDemoData(newUser.id);
-      
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      });
+
+      const { user, accessToken, refreshToken } = data.data;
+
+      dispatch(setUser({ user, token: accessToken, refreshToken }));
+
       toast.success('Registration successful! Welcome to TaskMatrix!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error('Registration failed');
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        error.response.data.errors.forEach(err => {
+          toast.error(err.message);
+        });
+      } else {
+        const message = error.response?.data?.message || 'Registration failed. Please try again.';
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -176,7 +163,7 @@ const Register = () => {
               {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
             </button>
           </div>
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Must be at least 6 characters</p>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Must be at least 8 characters with 1 uppercase, 1 lowercase letter, and 1 number</p>
         </div>
         
         <div>

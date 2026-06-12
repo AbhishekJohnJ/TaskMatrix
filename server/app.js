@@ -34,12 +34,27 @@ const socketHandler = require('./sockets/socketHandler');
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175'
+].filter(Boolean);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || /^http:\/\/localhost:\d+$/.test(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  credentials: true
+};
+
 // Initialize Socket.IO
 const io = socketIO(server, {
-  cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true
-  }
+  cors: corsOptions
 });
 
 // Make io accessible to routes
@@ -55,10 +70,7 @@ app.use(xss());
 app.use(hpp());
 
 // CORS configuration
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
-}));
+app.use(cors(corsOptions));
 
 // Body parser middleware
 app.use(express.json({ limit: '10mb' }));

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch } from 'react-icons/fi';
-import { getTasks, addTask, updateTask, deleteTask } from '../utils/localStorage';
+import { taskService } from '../services/taskService';
 import toast from 'react-hot-toast';
 
 const Tasks = () => {
@@ -13,6 +13,7 @@ const Tasks = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [editingTask, setEditingTask] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -29,9 +30,16 @@ const Tasks = () => {
     filterTasks();
   }, [tasks, searchQuery]);
 
-  const loadTasks = () => {
-    const allTasks = getTasks();
-    setTasks(allTasks);
+  const loadTasks = async () => {
+    try {
+      setLoading(true);
+      const data = await taskService.getAllTasks();
+      setTasks(data.data?.tasks || []);
+    } catch (error) {
+      toast.error('Failed to load tasks');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filterTasks = () => {
@@ -54,25 +62,28 @@ const Tasks = () => {
     setFilteredTasks(filtered);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     const taskData = {
       ...formData,
       tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
-      assignedTo: user.id,
     };
 
-    if (editingTask) {
-      updateTask(editingTask.id, taskData);
-      toast.success('Task updated successfully!');
-    } else {
-      addTask(taskData);
-      toast.success('Task created successfully!');
+    try {
+      if (editingTask) {
+        await taskService.updateTask(editingTask._id, taskData);
+        toast.success('Task updated successfully!');
+      } else {
+        await taskService.createTask(taskData);
+        toast.success('Task created successfully!');
+      }
+      await loadTasks();
+      resetForm();
+    } catch (error) {
+      const message = error.response?.data?.message || 'Operation failed';
+      toast.error(message);
     }
-
-    loadTasks();
-    resetForm();
   };
 
   const handleEdit = (task) => {
@@ -92,11 +103,15 @@ const Tasks = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (taskToDelete) {
-      deleteTask(taskToDelete.id);
-      loadTasks();
-      toast.success('Task deleted successfully!');
+      try {
+        await taskService.deleteTask(taskToDelete._id);
+        await loadTasks();
+        toast.success('Task deleted successfully!');
+      } catch (error) {
+        toast.error('Failed to delete task');
+      }
     }
     setShowDeleteModal(false);
     setTaskToDelete(null);
@@ -130,7 +145,7 @@ const Tasks = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'done': return 'text-red-800 bg-red-200 dark:bg-red-800 dark:text-red-200';
+      case 'completed': return 'text-red-800 bg-red-200 dark:bg-red-800 dark:text-red-200';
       case 'in-progress': return 'text-red-700 bg-red-100 dark:bg-red-900 dark:text-red-300';
       case 'todo': return 'text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400';
       default: return 'text-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200';
@@ -178,64 +193,74 @@ const Tasks = () => {
         </div>
       )}
 
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-12">
+          <div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-500 dark:text-gray-400 mt-3">Loading tasks...</p>
+        </div>
+      )}
+
       {/* Tasks Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTasks.map((task) => (
-          <div key={task.id} className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{task.title}</h3>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleEdit(task)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <FiEdit2 size={18} />
-                </button>
-                <button
-                  onClick={() => handleDeleteClick(task)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <FiTrash2 size={18} />
-                </button>
-              </div>
-            </div>
-
-            {task.description && (
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{task.description}</p>
-            )}
-
-            <div className="flex flex-wrap gap-2 mb-4">
-              <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(task.status)}`}>
-                {task.status}
-              </span>
-              <span className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                {task.priority}
-              </span>
-            </div>
-
-            {task.tags && task.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {task.tags.map((tag, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2 py-1 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 rounded text-xs"
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTasks.map((task) => (
+            <div key={task._id} className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{task.title}</h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(task)}
+                    className="text-red-600 hover:text-red-700"
                   >
-                    #{tag}
-                  </span>
-                ))}
+                    <FiEdit2 size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(task)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <FiTrash2 size={18} />
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
 
-      {filteredTasks.length === 0 && tasks.length > 0 && (
+              {task.description && (
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{task.description}</p>
+              )}
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(task.status)}`}>
+                  {task.status}
+                </span>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                  {task.priority}
+                </span>
+              </div>
+
+              {task.tags && task.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {task.tags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-1 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 rounded text-xs"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!loading && filteredTasks.length === 0 && tasks.length > 0 && (
         <div className="text-center py-12">
           <p className="text-gray-600 dark:text-gray-400">No tasks found matching your search.</p>
         </div>
       )}
 
-      {tasks.length === 0 && (
+      {!loading && tasks.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-600 dark:text-gray-400">No tasks yet. Create your first task!</p>
         </div>
@@ -287,7 +312,7 @@ const Tasks = () => {
                   >
                     <option value="todo">To Do</option>
                     <option value="in-progress">In Progress</option>
-                    <option value="done">Done</option>
+                    <option value="completed">Done</option>
                   </select>
                 </div>
 

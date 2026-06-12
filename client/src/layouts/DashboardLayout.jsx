@@ -3,7 +3,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
 import { useTheme } from '../hooks/useTheme';
-import { clearCurrentUser } from '../utils/localStorage';
+
 import Logo from '../components/Logo';
 import { 
   HiHome, HiClipboardList, HiViewBoards, HiCalendar, 
@@ -38,7 +38,6 @@ const DashboardLayout = () => {
   }, []);
 
   const handleLogout = () => {
-    clearCurrentUser();
     dispatch(logout());
     navigate('/login');
   };
@@ -111,11 +110,13 @@ const DashboardLayout = () => {
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {user?.fullName}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Admin</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                  {user?.role || 'User'}
+                </p>
               </div>
-              {user?.avatar ? (
+              {user?.profilePicture ? (
                 <img
-                  src={user.avatar}
+                  src={user.profilePicture}
                   alt="Profile"
                   className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                 />

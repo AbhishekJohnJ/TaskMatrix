@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { HiChevronLeft, HiChevronRight, HiPlus, HiX } from 'react-icons/hi';
-import { getTasks, addTask, updateTask, getTaskById } from '../utils/localStorage';
+import { taskService } from '../services/taskService';
 import toast from 'react-hot-toast';
 
 const Calendar = () => {
@@ -24,9 +24,13 @@ const Calendar = () => {
     loadTasks();
   }, []);
 
-  const loadTasks = () => {
-    const allTasks = getTasks();
-    setTasks(allTasks);
+  const loadTasks = async () => {
+    try {
+      const data = await taskService.getAllTasks();
+      setTasks(data.data?.tasks || []);
+    } catch (error) {
+      toast.error('Failed to load tasks');
+    }
   };
 
   // Calendar functions
@@ -91,29 +95,37 @@ const Calendar = () => {
     setShowTaskDetails(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     const taskData = {
       ...formData,
-      assignedTo: user.id,
       tags: [],
     };
 
-    addTask(taskData);
-    loadTasks();
-    toast.success('Task created successfully!');
-    resetForm();
-  };
-
-  const handleUpdateStatus = (newStatus) => {
-    if (selectedTask) {
-      updateTask(selectedTask.id, { status: newStatus });
-      loadTasks();
-      setSelectedTask({ ...selectedTask, status: newStatus });
-      toast.success(`Task moved to ${newStatus.replace('-', ' ')}`);
+    try {
+      await taskService.createTask(taskData);
+      await loadTasks();
+      toast.success('Task created successfully!');
+      resetForm();
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to create task';
+      toast.error(message);
     }
   };
+
+  const handleUpdateStatus = async (newStatus) => {
+    if (selectedTask) {
+      try {
+        await taskService.updateTask(selectedTask._id, { status: newStatus });
+        await loadTasks();
+        setSelectedTask({ ...selectedTask, status: newStatus });
+        toast.success(`Task moved to ${newStatus.replace('-', ' ')}`);
+      } catch (error) {
+        toast.error('Failed to update task status');
+      }
+    }
+  };;
 
   const resetForm = () => {
     setFormData({
@@ -138,7 +150,7 @@ const Calendar = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'done': return 'bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200';
+      case 'completed': return 'bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200';
       case 'in-progress': return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
       case 'todo': return 'bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
@@ -249,7 +261,7 @@ const Calendar = () => {
                     <div className="space-y-1">
                       {dayTasks.slice(0, 3).map((task) => (
                         <div
-                          key={task.id}
+                          key={task._id}
                           onClick={(e) => handleTaskClick(task, e)}
                           className={`text-xs p-1.5 rounded truncate ${getPriorityColor(task.priority)} text-white hover:opacity-80 transition-opacity`}
                         >
@@ -283,7 +295,7 @@ const Calendar = () => {
         <div className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Overdue</p>
           <p className="text-3xl font-bold text-red-600">
-            {tasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'done').length}
+            {tasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'completed').length}
           </p>
         </div>
         <div className="bg-white dark:bg-black rounded-xl p-6 shadow-sm dark:border dark:border-red-600">
@@ -382,7 +394,7 @@ const Calendar = () => {
                   >
                     <option value="todo">To Do</option>
                     <option value="in-progress">In Progress</option>
-                    <option value="done">Done</option>
+                    <option value="completed">Done</option>
                   </select>
                 </div>
               </div>
@@ -474,7 +486,7 @@ const Calendar = () => {
                     In Progress
                   </button>
                   <button
-                    onClick={() => handleUpdateStatus('done')}
+                    onClick={() => handleUpdateStatus('completed')}
                     className="flex-1 py-2 px-3 bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800 text-green-700 dark:text-green-200 rounded-lg text-sm font-medium"
                   >
                     Done

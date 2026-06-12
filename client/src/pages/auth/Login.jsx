@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/slices/authSlice';
 import toast from 'react-hot-toast';
 import { FiEye, FiEyeOff, FiMail, FiLock } from 'react-icons/fi';
-import { getUserByEmail, setCurrentUser } from '../../utils/localStorage';
+import { authService } from '../../services/authService';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -18,42 +18,26 @@ const Login = () => {
     setLoading(true);
     
     try {
-      // Get user from localStorage
-      const user = getUserByEmail(formData.email);
-      
-      if (!user) {
-        toast.error('User not found. Please register first.');
-        setLoading(false);
-        return;
-      }
-      
-      // Check password
-      if (user.password !== formData.password) {
-        toast.error('Invalid password');
-        setLoading(false);
-        return;
-      }
-      
-      // Remove password before storing
-      const userWithoutPassword = { ...user };
-      delete userWithoutPassword.password;
-      
-      // Set as current user
-      setCurrentUser(userWithoutPassword);
-      
-      const mockToken = 'token-' + user.id;
-      localStorage.setItem('token', mockToken);
-      
-      // Update Redux state
-      dispatch(setUser({
-        user: userWithoutPassword,
-        token: mockToken
-      }));
-      
+      const data = await authService.login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      const { user, accessToken, refreshToken } = data.data;
+
+      dispatch(setUser({ user, token: accessToken, refreshToken }));
+
       toast.success('Login successful!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error('Login failed');
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        error.response.data.errors.forEach(err => {
+          toast.error(err.message);
+        });
+      } else {
+        const message = error.response?.data?.message || 'Login failed. Please check your credentials.';
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from './redux/slices/authSlice';
+import { setUser, logout } from './redux/slices/authSlice';
 import { useTheme } from './hooks/useTheme';
+import { authService } from './services/authService';
 
 // Layouts
 import AuthLayout from './layouts/AuthLayout';
@@ -61,20 +62,24 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    // Check if user is logged in on app load
+    // On app load, validate the stored token against the server
     const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
     
-    if (token && user) {
-      try {
-        dispatch(setUser({
-          user: JSON.parse(user),
-          token
-        }));
-      } catch (error) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
+    if (token) {
+      authService.getCurrentUser()
+        .then((data) => {
+          const user = data.data?.user;
+          if (user) {
+            const refreshToken = localStorage.getItem('refreshToken');
+            dispatch(setUser({ user, token, refreshToken }));
+          } else {
+            dispatch(logout());
+          }
+        })
+        .catch(() => {
+          // Token invalid or expired — clear session
+          dispatch(logout());
+        });
     }
   }, [dispatch]);
 
