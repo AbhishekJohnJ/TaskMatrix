@@ -58,4 +58,28 @@ export const taskService = {
     });
     return response.data;
   },
+
+  // Get team tasks
+  getTeamTasks: async (teamId) => {
+    const response = await api.get(`/tasks/team/${teamId}`);
+    return response.data;
+  },
+
+  // Get available team tasks
+  getAvailableTeamTasks: async (teamId) => {
+    const response = await api.get(`/tasks/team/${teamId}/available`);
+    return response.data;
+  },
+
+  // Assign team task
+  assignTeamTask: async (taskId, assignedTo) => {
+    const response = await api.patch(`/tasks/${taskId}/assign`, { assignedTo });
+    return response.data;
+  },
+
+  // Take team task
+  takeTeamTask: async (taskId) => {
+    const response = await api.patch(`/tasks/${taskId}/take`);
+    return response.data;
+  },
 };

@@ -77,7 +77,16 @@ exports.getTeam = async (req, res) => {
       });
     }
     
-    if (!team.isMember(req.user.id) && req.user.role !== 'admin') {
+    // Check if user is owner
+    const isOwner = team.owner._id.toString() === req.user.id.toString();
+    
+    // Check if user is in members list
+    const isMember = team.members.some(member => {
+      const memberId = member.user._id || member.user;
+      return memberId.toString() === req.user.id.toString();
+    });
+    
+    if (!isOwner && !isMember && req.user.role !== 'admin') {
       return res.status(403).json({
         status: 'error',
         message: 'You do not have access to this team'
@@ -261,6 +270,112 @@ exports.removeMember = async (req, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Error removing member'
+    });
+  }
+};
+
+// Create team task (team leader splits tasks)
+exports.createTeamTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const team = await Team.findById(id);
+    
+    if (!team) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Team not found'
+      });
+    }
+    
+    // Check if user is owner
+    const isOwner = team.owner.toString() === req.user.id.toString();
+    
+    // Check if user is manager
+    const memberRecord = team.members.find(m => {
+      const memberId = m.user._id || m.user;
+      return memberId.toString() === req.user.id.toString();
+    });
+    const isManager = memberRecord && (memberRecord.role === 'manager' || memberRecord.role === 'owner');
+    
+    if (!isOwner && !isManager) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'Only team leaders/managers can create team tasks'
+      });
+    }
+    
+    const Task = require('../models/Task');
+    
+    // Clean up the request body
+    const taskData = {
+      title: req.body.title,
+      description: req.body.description || '',
+      priority: req.body.priority || 'medium',
+      dueDate: req.body.dueDate || null,
+      tags: req.body.tags || [],
+      team: id,
+      isTeamTask: true,
+      createdBy: req.user.id
+    };
+    
+    // Handle assignment
+    if (req.body.assignedTo && req.body.assignedTo !== '') {
+      taskData.assignedTo = req.body.assignedTo;
+      taskData.availableForTeam = false;
+    } else {
+      taskData.assignedTo = null;
+      taskData.availableForTeam = true;
+    }
+    
+    const task = await Task.create(taskData);
+    await task.populate('createdBy assignedTo', 'fullName username profilePicture');
+    await task.populate('team', 'name color');
+    
+    // If task is assigned, notify the assignee
+    if (task.assignedTo) {
+      await Notification.createNotification({
+        recipient: task.assignedTo._id,
+        sender: req.user.id,
+        type: 'task_assigned',
+        title: 'Team Task Assigned',
+        message: `${req.user.fullName} assigned you a team task: ${task.title}`,
+        relatedTask: task._id,
+        relatedTeam: team._id,
+        actionUrl: `/tasks/${task._id}`
+      });
+      
+      const io = req.app.get('io');
+      if (io && io.emitToUser) {
+        io.emitToUser(task.assignedTo._id, 'notification', {
+          type: 'task_assigned',
+          task: task
+        });
+      }
+    }
+    
+    // Notify all team members about new available task
+    if (task.availableForTeam && !task.assignedTo) {
+      const ActivityLog = require('../models/ActivityLog');
+      await ActivityLog.logActivity({
+        user: req.user.id,
+        action: 'team_task_created',
+        description: `Created available team task: ${task.title}`,
+        relatedTask: task._id,
+        relatedTeam: team._id,
+        ipAddress: req.ip
+      });
+    }
+    
+    res.status(201).json({
+      status: 'success',
+      message: 'Team task created successfully',
+      data: { task }
+    });
+  } catch (error) {
+    console.error('Create team task error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error creating team task'
     });
   }
 };

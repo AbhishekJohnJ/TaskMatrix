@@ -64,6 +64,20 @@ const taskSchema = new mongoose.Schema({
     default: null,
     index: true
   },
+  isTeamTask: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  assignedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  availableForTeam: {
+    type: Boolean,
+    default: false
+  },
   position: {
     type: Number,
     default: 0

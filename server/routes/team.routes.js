@@ -24,5 +24,6 @@ router.route('/:id')
 
 router.post('/:id/invite', inviteMemberValidator, validate, teamController.inviteMember);
 router.delete('/:id/members/:userId', teamIdValidator, validate, teamController.removeMember);
+router.post('/:id/tasks', teamIdValidator, validate, teamController.createTeamTask);
 
 module.exports = router;

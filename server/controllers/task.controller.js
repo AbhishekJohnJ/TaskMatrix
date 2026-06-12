@@ -197,7 +197,7 @@ exports.getTask = async (req, res) => {
 // Update task
 exports.updateTask = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findById(req.params.id).populate('team');
     
     if (!task) {
       return res.status(404).json({
@@ -207,9 +207,11 @@ exports.updateTask = async (req, res) => {
     }
     
     // Check permission
-    if (req.user.role !== 'admin' && 
-        task.createdBy.toString() !== req.user.id.toString() && 
-        (!task.assignedTo || task.assignedTo.toString() !== req.user.id.toString())) {
+    const isCreator = task.createdBy.toString() === req.user.id.toString();
+    const isAssignee = task.assignedTo && task.assignedTo.toString() === req.user.id.toString();
+    const isTeamManager = task.team && task.team.canManage && task.team.canManage(req.user.id);
+    
+    if (req.user.role !== 'admin' && !isCreator && !isAssignee && !isTeamManager) {
       return res.status(403).json({
         status: 'error',
         message: 'You do not have permission to update this task'
@@ -223,7 +225,31 @@ exports.updateTask = async (req, res) => {
     // Update task
     Object.assign(task, req.body);
     await task.save();
-    await task.populate('createdBy assignedTo', 'fullName username profilePicture');
+    await task.populate('createdBy assignedTo assignedBy', 'fullName username profilePicture');
+    await task.populate('team', 'name color owner');
+    
+    // Notify team leader when task is completed by team member
+    if (oldStatus !== 'completed' && task.status === 'completed' && task.isTeamTask && task.team) {
+      const teamLeaderId = task.team.owner.toString();
+      if (req.user.id.toString() !== teamLeaderId) {
+        await Notification.createNotification({
+          recipient: teamLeaderId,
+          sender: req.user.id,
+          type: 'task_completed',
+          title: 'Team Task Completed',
+          message: `${req.user.fullName} completed the task: ${task.title}`,
+          relatedTask: task._id,
+          relatedTeam: task.team._id,
+          actionUrl: `/tasks/${task._id}`
+        });
+        
+        const io = req.app.get('io');
+        io.emitToUser(teamLeaderId, 'notification', {
+          type: 'task_completed',
+          task: task
+        });
+      }
+    }
     
     // Create notifications for status change
     if (oldStatus !== task.status && task.assignedTo) {
@@ -257,7 +283,7 @@ exports.updateTask = async (req, res) => {
       action: 'task_updated',
       description: `Updated task: ${task.title}`,
       relatedTask: task._id,
-      relatedTeam: task.team,
+      relatedTeam: task.team?._id,
       changes: {
         before: { status: oldStatus, assignedTo: oldAssignedTo },
         after: { status: task.status, assignedTo: task.assignedTo }
@@ -268,7 +294,7 @@ exports.updateTask = async (req, res) => {
     // Emit socket event
     const io = req.app.get('io');
     if (task.team) {
-      io.emitToTeam(task.team, 'task:updated', task);
+      io.emitToTeam(task.team._id, 'task:updated', task);
     }
     if (task.assignedTo) {
       io.emitToUser(task.assignedTo._id, 'task:updated', task);
@@ -444,6 +470,255 @@ exports.archiveTask = async (req, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Error archiving task'
+    });
+  }
+};
+
+// Get team tasks (for team leader)
+exports.getTeamTasks = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Team not found'
+      });
+    }
+    
+    if (!team.isMember(req.user.id)) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You are not a member of this team'
+      });
+    }
+    
+    const tasks = await Task.find({ 
+      team: teamId,
+      isTeamTask: true
+    })
+      .populate('createdBy assignedTo assignedBy', 'fullName username profilePicture')
+      .populate('team', 'name color')
+      .sort({ createdAt: -1 });
+    
+    res.json({
+      status: 'success',
+      data: { tasks, count: tasks.length }
+    });
+  } catch (error) {
+    console.error('Get team tasks error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error fetching team tasks'
+    });
+  }
+};
+
+// Get available team tasks (unassigned tasks for team members to pick)
+exports.getAvailableTeamTasks = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Team not found'
+      });
+    }
+    
+    if (!team.isMember(req.user.id)) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You are not a member of this team'
+      });
+    }
+    
+    const tasks = await Task.find({ 
+      team: teamId,
+      isTeamTask: true,
+      availableForTeam: true,
+      assignedTo: null
+    })
+      .populate('createdBy', 'fullName username profilePicture')
+      .populate('team', 'name color')
+      .sort({ createdAt: -1 });
+    
+    res.json({
+      status: 'success',
+      data: { tasks, count: tasks.length }
+    });
+  } catch (error) {
+    console.error('Get available team tasks error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error fetching available team tasks'
+    });
+  }
+};
+
+// Assign team task (team leader assigns task to member)
+exports.assignTeamTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { assignedTo } = req.body;
+    
+    const task = await Task.findById(id).populate('team');
+    
+    if (!task) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Task not found'
+      });
+    }
+    
+    if (!task.isTeamTask || !task.team) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'This is not a team task'
+      });
+    }
+    
+    // Check if user can manage team
+    if (!task.team.canManage(req.user.id)) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'Only team leaders/managers can assign tasks'
+      });
+    }
+    
+    // Check if assignee is team member
+    if (!task.team.isMember(assignedTo)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Assignee must be a team member'
+      });
+    }
+    
+    task.assignedTo = assignedTo;
+    task.assignedBy = req.user.id;
+    task.availableForTeam = false;
+    await task.save();
+    
+    await task.populate('createdBy assignedTo assignedBy', 'fullName username profilePicture');
+    
+    // Notify assignee
+    await Notification.createNotification({
+      recipient: assignedTo,
+      sender: req.user.id,
+      type: 'task_assigned',
+      title: 'Team Task Assigned',
+      message: `${req.user.fullName} assigned you a team task: ${task.title}`,
+      relatedTask: task._id,
+      relatedTeam: task.team._id,
+      actionUrl: `/tasks/${task._id}`
+    });
+    
+    const io = req.app.get('io');
+    io.emitToUser(assignedTo, 'notification', {
+      type: 'task_assigned',
+      task: task
+    });
+    io.emitToTeam(task.team._id, 'task:updated', task);
+    
+    res.json({
+      status: 'success',
+      message: 'Task assigned successfully',
+      data: { task }
+    });
+  } catch (error) {
+    console.error('Assign team task error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error assigning task'
+    });
+  }
+};
+
+// Take available team task (team member picks a task)
+exports.takeTeamTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const task = await Task.findById(id).populate('team');
+    
+    if (!task) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Task not found'
+      });
+    }
+    
+    if (!task.isTeamTask || !task.team) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'This is not a team task'
+      });
+    }
+    
+    if (!task.availableForTeam) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'This task is not available to take'
+      });
+    }
+    
+    if (task.assignedTo) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'This task is already assigned'
+      });
+    }
+    
+    // Check if user is team member
+    if (!task.team.isMember(req.user.id)) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You must be a team member to take this task'
+      });
+    }
+    
+    task.assignedTo = req.user.id;
+    task.availableForTeam = false;
+    await task.save();
+    
+    await task.populate('createdBy assignedTo', 'fullName username profilePicture');
+    
+    // Notify team leader
+    const teamLeaderId = task.team.owner.toString();
+    if (teamLeaderId !== req.user.id.toString()) {
+      await Notification.createNotification({
+        recipient: teamLeaderId,
+        sender: req.user.id,
+        type: 'task_taken',
+        title: 'Team Task Taken',
+        message: `${req.user.fullName} took the task: ${task.title}`,
+        relatedTask: task._id,
+        relatedTeam: task.team._id,
+        actionUrl: `/tasks/${task._id}`
+      });
+      
+      const io = req.app.get('io');
+      io.emitToUser(teamLeaderId, 'notification', {
+        type: 'task_taken',
+        task: task
+      });
+    }
+    
+    const io = req.app.get('io');
+    io.emitToTeam(task.team._id, 'task:updated', task);
+    
+    res.json({
+      status: 'success',
+      message: 'Task taken successfully',
+      data: { task }
+    });
+  } catch (error) {
+    console.error('Take team task error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error taking task'
     });
   }
 };

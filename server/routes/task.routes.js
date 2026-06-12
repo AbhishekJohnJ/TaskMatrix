@@ -21,6 +21,12 @@ router.route('/')
 
 router.get('/by-status', taskController.getTasksByStatus);
 
+// Team task routes
+router.get('/team/:teamId', taskController.getTeamTasks);
+router.get('/team/:teamId/available', taskController.getAvailableTeamTasks);
+router.patch('/:id/assign', taskIdValidator, validate, taskController.assignTeamTask);
+router.patch('/:id/take', taskIdValidator, validate, taskController.takeTeamTask);
+
 router.route('/:id')
   .get(taskIdValidator, validate, taskController.getTask)
   .put(updateTaskValidator, validate, taskController.updateTask)
