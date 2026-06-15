@@ -101,7 +101,7 @@ const About = () => {
       {/* Hero Section */}
       <div className="text-center mb-16">
         <div className="flex justify-center mb-6">
-          <div className="bg-gradient-to-br from-red-600 to-red-700 p-6 rounded-3xl shadow-2xl">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl shadow-2xl border-4 border-red-600 dark:border-red-700 hover:border-red-700 dark:hover:border-red-600 transition-all duration-300 hover:shadow-red-500/20 hover:scale-105 transform">
             <Logo size={64} />
           </div>
         </div>
