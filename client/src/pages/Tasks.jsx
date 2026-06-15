@@ -243,6 +243,14 @@ const Tasks = () => {
                     {task.team.name}
                   </span>
                 )}
+                {task.assignedTo && task.isTeamTask && (
+                  <span className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                    {task.assignedTo.fullName || task.assignedTo.username}
+                  </span>
+                )}
               </div>
 
               {task.tags && task.tags.length > 0 && (

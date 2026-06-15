@@ -21,9 +21,11 @@ const notificationSchema = new mongoose.Schema({
       'task_commented',
       'task_due_soon',
       'task_overdue',
+      'task_taken',
       'team_invitation',
       'team_joined',
       'team_left',
+      'team_member_added',
       'mention',
       'system_announcement'
     ],

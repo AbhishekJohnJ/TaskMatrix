@@ -24,6 +24,7 @@ import TeamDetail from './pages/TeamDetail';
 import Analytics from './pages/Analytics';
 import About from './pages/About';
 import Profile from './pages/Profile';
+import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
 
 // Protected Route Component
@@ -105,6 +106,7 @@ function App() {
         <Route path="/kanban" element={<KanbanBoard />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/notifications" element={<Notifications />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
       </Route>

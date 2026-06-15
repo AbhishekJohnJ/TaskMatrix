@@ -366,6 +366,15 @@ const KanbanBoard = () => {
                         </span>
                       )}
 
+                      {task.assignedTo && task.isTeamTask && (
+                        <span className="text-xs px-2 py-1 rounded-full font-medium bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200 flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                          {task.assignedTo.fullName || task.assignedTo.username}
+                        </span>
+                      )}
+
                       {task.dueDate && (
                         <div className={`flex items-center gap-1 text-xs ${
                           isOverdue(task.dueDate) && task.status !== 'completed'

@@ -2,25 +2,105 @@ import { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
+import { setNotifications, setUnreadCount, markAsRead, markAllAsRead, addNotification } from '../redux/slices/notificationSlice';
 import { useTheme } from '../hooks/useTheme';
+import { notificationService } from '../services/notificationService';
 
 import Logo from '../components/Logo';
 import { 
   HiHome, HiClipboardList, HiViewBoards, HiCalendar, 
   HiChartBar, HiInformationCircle, HiUser, HiUserGroup,
   HiLogout, HiMenuAlt2, HiX, HiSun, HiMoon, 
-  HiBell, HiChevronLeft, HiChevronRight 
+  HiBell, HiChevronLeft, HiChevronRight, HiCheck, HiCheckCircle
 } from 'react-icons/hi';
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notificationCount] = useState(3);
+  const [showNotifications, setShowNotifications] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
+  const { notifications, unreadCount } = useSelector((state) => state.notifications);
   const { theme, toggleTheme } = useTheme();
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    fetchNotifications();
+    fetchUnreadCount();
+    
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(() => {
+      fetchUnreadCount();
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const data = await notificationService.getNotifications(1, 10);
+      dispatch(setNotifications(data.data?.notifications || []));
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+    }
+  };
+
+  const fetchUnreadCount = async () => {
+    try {
+      const data = await notificationService.getUnreadCount();
+      dispatch(setUnreadCount(data.data?.count || 0));
+    } catch (error) {
+      console.error('Failed to fetch unread count:', error);
+    }
+  };
+
+  const handleMarkAsRead = async (notificationId) => {
+    try {
+      await notificationService.markAsRead(notificationId);
+      dispatch(markAsRead(notificationId));
+      fetchUnreadCount();
+    } catch (error) {
+      console.error('Failed to mark as read:', error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      dispatch(markAllAsRead());
+      fetchNotifications(); // Refresh the list
+    } catch (error) {
+      console.error('Failed to mark all as read:', error);
+    }
+  };
+
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case 'task_completed':
+        return <HiCheckCircle className="text-green-500" size={20} />;
+      case 'task_assigned':
+        return <HiClipboardList className="text-blue-500" size={20} />;
+      case 'task_taken':
+        return <HiUser className="text-purple-500" size={20} />;
+      case 'team_member_added':
+        return <HiUserGroup className="text-red-500" size={20} />;
+      default:
+        return <HiBell className="text-gray-500" size={20} />;
+    }
+  };
+
+  const getTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    if (seconds < 60) return 'just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  };
 
   // Handle responsive sidebar
   useEffect(() => {
@@ -36,6 +116,18 @@ const DashboardLayout = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Close notifications dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showNotifications && !event.target.closest('.notifications-dropdown')) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifications]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -85,12 +177,102 @@ const DashboardLayout = () => {
           
           <div className="flex items-center gap-2 md:gap-4">
             {/* Notifications */}
-            <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-              <HiBell className="text-gray-600 dark:text-gray-300" size={20} />
-              {notificationCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            <div className="relative notifications-dropdown">
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <HiBell className="text-gray-600 dark:text-gray-300" size={20} />
+                {unreadCount > 0 && (
+                  <span className="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications Dropdown */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-96 max-h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Notifications
+                    </h3>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={handleMarkAllAsRead}
+                        className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium"
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Notifications List */}
+                  <div className="max-h-[400px] overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((notification) => (
+                        <div
+                          key={notification._id}
+                          className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer transition-colors ${
+                            !notification.isRead ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                          }`}
+                          onClick={() => {
+                            if (!notification.isRead) {
+                              handleMarkAsRead(notification._id);
+                            }
+                            if (notification.actionUrl) {
+                              navigate(notification.actionUrl);
+                              setShowNotifications(false);
+                            }
+                          }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="mt-1">
+                              {getNotificationIcon(notification.type)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                {notification.title}
+                              </p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                {getTimeAgo(notification.createdAt)}
+                              </p>
+                            </div>
+                            {!notification.isRead && (
+                              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-4 py-8 text-center">
+                        <HiBell className="mx-auto text-gray-400 mb-2" size={48} />
+                        <p className="text-gray-600 dark:text-gray-400">No notifications yet</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  {notifications.length > 0 && (
+                    <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 text-center">
+                      <button
+                        onClick={() => {
+                          setShowNotifications(false);
+                          navigate('/notifications');
+                        }}
+                        className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium"
+                      >
+                        View all notifications
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
-            </button>
+            </div>
 
             {/* Theme toggle */}
             <button

@@ -317,7 +317,7 @@ exports.updateTask = async (req, res) => {
 // Delete task
 exports.deleteTask = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findById(req.params.id).populate('team');
     
     if (!task) {
       return res.status(404).json({
@@ -327,12 +327,19 @@ exports.deleteTask = async (req, res) => {
     }
     
     // Check permission
-    if (req.user.role !== 'admin' && task.createdBy.toString() !== req.user.id.toString()) {
+    const isCreator = task.createdBy.toString() === req.user.id.toString();
+    const isTeamLeader = task.team && task.team.canManage && task.team.canManage(req.user.id);
+    const isAdmin = req.user.role === 'admin';
+    
+    if (!isAdmin && !isCreator && !isTeamLeader) {
       return res.status(403).json({
         status: 'error',
         message: 'You do not have permission to delete this task'
       });
     }
+    
+    const teamId = task.team?._id;
+    const taskTitle = task.title;
     
     await task.deleteOne();
     
@@ -340,15 +347,15 @@ exports.deleteTask = async (req, res) => {
     await ActivityLog.logActivity({
       user: req.user.id,
       action: 'task_deleted',
-      description: `Deleted task: ${task.title}`,
-      relatedTeam: task.team,
+      description: `Deleted task: ${taskTitle}`,
+      relatedTeam: teamId,
       ipAddress: req.ip
     });
     
     // Emit socket event
     const io = req.app.get('io');
-    if (task.team) {
-      io.emitToTeam(task.team, 'task:deleted', { taskId: task._id });
+    if (teamId) {
+      io.emitToTeam(teamId, 'task:deleted', { taskId: req.params.id });
     }
     
     res.json({

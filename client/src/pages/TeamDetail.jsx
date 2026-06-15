@@ -17,7 +17,9 @@ const TeamDetail = () => {
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
   const [showAssignTaskModal, setShowAssignTaskModal] = useState(false);
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [taskToDelete, setTaskToDelete] = useState(null);
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [taskFormData, setTaskFormData] = useState({
@@ -155,6 +157,27 @@ const TeamDetail = () => {
     }
   };
 
+  const handleDeleteTask = async () => {
+    if (!taskToDelete) return;
+    
+    try {
+      await taskService.deleteTask(taskToDelete._id);
+      toast.success('Task deleted successfully!');
+      loadTeamTasks();
+      loadAvailableTasks();
+      setShowDeleteConfirmModal(false);
+      setTaskToDelete(null);
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to delete task';
+      toast.error(message);
+    }
+  };
+
+  const openDeleteConfirmation = (task) => {
+    setTaskToDelete(task);
+    setShowDeleteConfirmModal(true);
+  };
+
   const isTeamLeader = team && user && team.owner?._id === user.id;
 
   if (!team) {
@@ -240,17 +263,28 @@ const TeamDetail = () => {
                   >
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold text-gray-900 dark:text-white">{task.title}</h3>
-                      {isTeamLeader && !task.assignedTo && (
-                        <button
-                          onClick={() => {
-                            setSelectedTask(task);
-                            setShowAssignTaskModal(true);
-                          }}
-                          className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                        >
-                          Assign
-                        </button>
-                      )}
+                      <div className="flex gap-2">
+                        {isTeamLeader && !task.assignedTo && (
+                          <button
+                            onClick={() => {
+                              setSelectedTask(task);
+                              setShowAssignTaskModal(true);
+                            }}
+                            className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                          >
+                            Assign
+                          </button>
+                        )}
+                        {isTeamLeader && (
+                          <button
+                            onClick={() => openDeleteConfirmation(task)}
+                            className="p-1 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded transition-colors"
+                            title="Delete task"
+                          >
+                            <HiTrash size={18} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     {task.description && (
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{task.description}</p>
@@ -660,6 +694,50 @@ const TeamDetail = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirmModal && taskToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-md w-full shadow-2xl dark:border-2 dark:border-red-600">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                <HiTrash className="text-red-600 dark:text-red-400" size={24} />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Delete Task</h2>
+            </div>
+
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
+              Are you sure you want to delete the task:
+            </p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              "{taskToDelete.title}"
+            </p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-6">
+              <p className="text-sm text-red-800 dark:text-red-300">
+                ⚠️ This action cannot be undone. The task will be permanently deleted.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeleteTask}
+                className="flex-1 bg-red-600 text-white py-2.5 px-4 rounded-lg hover:bg-red-700 font-medium transition-colors"
+              >
+                Delete Task
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteConfirmModal(false);
+                  setTaskToDelete(null);
+                }}
+                className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -215,15 +215,20 @@ exports.inviteMember = async (req, res) => {
     team.addMember(user._id, 'member');
     await team.save();
     
+    // Send notification to invited user
     await Notification.createNotification({
       recipient: user._id,
       sender: req.user.id,
-      type: 'team_joined',
+      type: 'team_member_added',
       title: 'Added to Team',
       message: `${req.user.fullName} added you to team "${team.name}"`,
       relatedTeam: team._id,
-      actionUrl: `/teams/${team._id}`
+      actionUrl: `/teams/${team._id}`,
+      priority: 'high'
     });
+    
+    await team.populate('owner', 'fullName username profilePicture email');
+    await team.populate('members.user', 'fullName username profilePicture email');
     
     res.json({
       status: 'success',
