@@ -142,16 +142,16 @@ const Teams = () => {
           {teams.map((team, index) => (
             <div
               key={team._id}
-              className="bg-white dark:bg-black rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer dark:border dark:border-red-600"
+              className="bg-white dark:bg-black rounded-xl p-6 shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer dark:border dark:border-red-600 transform hover:-translate-y-2 group"
               onClick={() => navigate(`/teams/${team._id}`)}
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getTeamColor(index)} flex items-center justify-center`}>
+                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getTeamColor(index)} flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-md`}>
                     <HiUserGroup className="text-white" size={24} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{team.name}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">{team.name}</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       {team.members?.length || 0} members
                     </p>
@@ -160,13 +160,13 @@ const Teams = () => {
                 <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => handleEdit(team)}
-                    className="text-blue-600 hover:text-blue-700 p-1"
+                    className="text-blue-600 hover:text-blue-700 p-1 hover:scale-110 transition-transform"
                   >
                     <FiEdit2 size={16} />
                   </button>
                   <button
                     onClick={() => handleDeleteClick(team)}
-                    className="text-red-600 hover:text-red-700 p-1"
+                    className="text-red-600 hover:text-red-700 p-1 hover:scale-110 transition-transform"
                   >
                     <FiTrash2 size={16} />
                   </button>

@@ -136,12 +136,12 @@ const About = () => {
             return (
               <div
                 key={index}
-                className="bg-white dark:bg-black rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 dark:border-red-900 hover:border-red-600 dark:hover:border-red-600 group"
+                className="bg-white dark:bg-black rounded-2xl p-6 shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-red-900/50 hover:border-red-600 dark:hover:border-red-600 group cursor-pointer transform hover:-translate-y-1"
               >
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-md group-hover:shadow-lg`}>
                   <Icon className="text-white" size={28} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">
                   {feature.title}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">
@@ -165,14 +165,14 @@ const About = () => {
             return (
               <div
                 key={index}
-                className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black rounded-xl p-6 border border-gray-200 dark:border-gray-800 hover:border-red-600 dark:hover:border-red-600 transition-all"
+                className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black rounded-xl p-6 border border-gray-200 dark:border-gray-800 hover:border-red-600 dark:hover:border-red-600 transition-all duration-300 hover:shadow-lg cursor-pointer transform hover:-translate-y-1 group"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-md">
                     <Icon className="text-white" size={20} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-base text-gray-900 dark:text-white mb-1">
+                    <h4 className="font-bold text-base text-gray-900 dark:text-white mb-1 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">
                       {feature.title}
                     </h4>
                     <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
@@ -187,9 +187,11 @@ const About = () => {
       </div>
 
       {/* Team Collaboration Section */}
-      <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-black dark:to-black rounded-3xl p-8 md:p-12 border-2 border-red-200 dark:border-red-900 mb-16 dark:shadow-[0_0_20px_rgba(220,38,38,0.3)]">
+      <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-black dark:to-black rounded-3xl p-8 md:p-12 border-2 border-red-200 dark:border-red-900 mb-16 dark:shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-2xl transition-all duration-300">
         <div className="flex items-center gap-3 mb-6 justify-center">
-          <HiUserGroup className="text-red-600 dark:text-red-500" size={40} />
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center shadow-lg">
+            <HiUserGroup className="text-white" size={40} />
+          </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
             Team Collaboration Features
           </h2>
@@ -203,12 +205,12 @@ const About = () => {
           {teamFeatures.map((feature, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 bg-white dark:bg-gray-900 rounded-lg p-4 border border-red-200 dark:border-red-800"
+              className="flex items-center gap-3 bg-white dark:bg-gray-900 rounded-lg p-4 border border-red-200 dark:border-red-800 hover:border-red-600 dark:hover:border-red-600 transition-all duration-300 hover:shadow-md cursor-pointer transform hover:translate-x-2 group"
             >
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-600 flex items-center justify-center">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <HiCheckCircle className="text-white" size={16} />
               </div>
-              <span className="text-gray-900 dark:text-white font-medium">
+              <span className="text-gray-900 dark:text-white font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">
                 {feature}
               </span>
             </div>
@@ -216,19 +218,19 @@ const About = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-black dark:to-black rounded-3xl p-8 md:p-12 border-2 border-blue-200 dark:border-blue-900 mb-16 dark:shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+      {/* Why Choose TaskMatrix */}
+      <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-black dark:to-black rounded-3xl p-8 md:p-12 border-2 border-blue-200 dark:border-blue-900 mb-16 dark:shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-2xl transition-all duration-300">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">
           Why Choose TaskMatrix?
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+          <div className="flex items-start gap-4 group cursor-pointer">
+            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
               <HiCheckCircle className="text-white" size={24} />
             </div>
             <div>
-              <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">
+              <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2 group-hover:text-green-600 dark:group-hover:text-green-500 transition-colors">
                 Full-Stack Solution
               </h4>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -237,12 +239,12 @@ const About = () => {
             </div>
           </div>
 
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+          <div className="flex items-start gap-4 group cursor-pointer">
+            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
               <HiCheckCircle className="text-white" size={24} />
             </div>
             <div>
-              <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">
+              <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-500 transition-colors">
                 Real-Time Collaboration
               </h4>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -251,12 +253,12 @@ const About = () => {
             </div>
           </div>
 
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+          <div className="flex items-start gap-4 group cursor-pointer">
+            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
               <HiCheckCircle className="text-white" size={24} />
             </div>
             <div>
-              <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">
+              <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-500 transition-colors">
                 Team Collaboration Efficient
               </h4>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -265,12 +267,12 @@ const About = () => {
             </div>
           </div>
 
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg">
+          <div className="flex items-start gap-4 group cursor-pointer">
+            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
               <HiCheckCircle className="text-white" size={24} />
             </div>
             <div>
-              <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">
+              <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">
                 Modern UI/UX
               </h4>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -283,7 +285,7 @@ const About = () => {
 
       {/* Footer */}
       <div className="text-center pb-8">
-        <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-8 md:p-12 shadow-2xl mb-12">
+        <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-8 md:p-12 shadow-2xl mb-12 hover:shadow-3xl hover:scale-[1.02] transition-all duration-300">
           <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Get Started?
           </h3>
@@ -299,7 +301,7 @@ const About = () => {
             {['React', 'Node.js', 'Express', 'MongoDB', 'Mongoose', 'Redux Toolkit', 'Tailwind CSS', 'Socket.io', 'JWT', 'Vite'].map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1 bg-gray-100 dark:bg-gray-900 rounded text-gray-600 dark:text-gray-400 text-xs"
+                className="px-3 py-1 bg-gray-100 dark:bg-gray-900 rounded text-gray-600 dark:text-gray-400 text-xs hover:opacity-100 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 cursor-pointer"
               >
                 {tech}
               </span>

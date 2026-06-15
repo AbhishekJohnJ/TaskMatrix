@@ -7,7 +7,7 @@ const Logo = ({ size = 32, className = '' }) => {
         viewBox="0 0 100 100"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className={`${className} logo-shine`}
+        className={className}
       >
         {/* Grid dots and connections */}
         {/* Top row */}
@@ -49,55 +49,6 @@ const Logo = ({ size = 32, className = '' }) => {
           fill="none"
         />
       </svg>
-      
-      {/* Shine overlay effect */}
-      <div className="absolute inset-0 logo-shine-overlay pointer-events-none"></div>
-      
-      <style jsx>{`
-        @keyframes logo-shine {
-          0% {
-            filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
-          }
-          50% {
-            filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
-          }
-          100% {
-            filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
-          }
-        }
-
-        @keyframes shine-sweep {
-          0% {
-            left: -100%;
-            opacity: 0;
-          }
-          20% {
-            opacity: 1;
-          }
-          80% {
-            opacity: 1;
-          }
-          100% {
-            left: 200%;
-            opacity: 0;
-          }
-        }
-
-        .logo-shine {
-          animation: logo-shine 3s ease-in-out infinite;
-        }
-
-        .logo-shine-overlay {
-          background: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.8) 50%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          animation: shine-sweep 3s ease-in-out infinite;
-          width: 50%;
-        }
-      `}</style>
     </div>
   );
 };
