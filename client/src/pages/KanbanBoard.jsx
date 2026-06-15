@@ -94,11 +94,25 @@ const KanbanBoard = () => {
     e.preventDefault();
     if (draggedTask && draggedTask.status !== newStatus) {
       try {
+        // Optimistically update UI first
+        const updatedTask = { ...draggedTask, status: newStatus };
+        
+        // Remove from old column and add to new column
+        const newTasks = {
+          ...tasks,
+          [draggedTask.status]: tasks[draggedTask.status].filter(t => t._id !== draggedTask._id),
+          [newStatus]: [...tasks[newStatus], updatedTask]
+        };
+        
+        setTasks(newTasks);
+        
+        // Then update on server
         await taskService.updateTask(draggedTask._id, { status: newStatus });
-        await loadTasks();
         toast.success(`Task moved to ${newStatus.replace('-', ' ')}`);
       } catch (error) {
+        // If server update fails, reload to get correct state
         toast.error('Failed to update task status');
+        await loadTasks();
       }
     }
     setDraggedTask(null);
@@ -142,11 +156,35 @@ const KanbanBoard = () => {
 
   const handleDeleteTask = async (taskId) => {
     try {
+      // Find which column the task is in
+      let taskColumn = null;
+      let taskToDelete = null;
+      
+      for (const [column, columnTasks] of Object.entries(tasks)) {
+        const found = columnTasks.find(t => t._id === taskId);
+        if (found) {
+          taskColumn = column;
+          taskToDelete = found;
+          break;
+        }
+      }
+      
+      if (!taskColumn) return;
+      
+      // Optimistically remove from UI
+      const newTasks = {
+        ...tasks,
+        [taskColumn]: tasks[taskColumn].filter(t => t._id !== taskId)
+      };
+      setTasks(newTasks);
+      
+      // Then delete on server
       await taskService.deleteTask(taskId);
-      await loadTasks();
       toast.success('Task deleted!');
     } catch (error) {
+      // If server delete fails, reload to get correct state
       toast.error('Failed to delete task');
+      await loadTasks();
     }
   };
 
@@ -191,9 +229,30 @@ const KanbanBoard = () => {
   };
 
   const columns = [
-    { id: 'todo', title: 'To Do', bgColor: 'bg-red-50 dark:bg-red-950', icon: HiClipboardList, iconColor: 'text-red-600 dark:text-red-400' },
-    { id: 'in-progress', title: 'In Progress', bgColor: 'bg-red-100 dark:bg-red-900', icon: HiLightningBolt, iconColor: 'text-red-700 dark:text-red-300' },
-    { id: 'completed', title: 'Done', bgColor: 'bg-red-200 dark:bg-red-800', icon: HiCheckCircle, iconColor: 'text-red-800 dark:text-red-200' },
+    { 
+      id: 'todo', 
+      title: 'To Do', 
+      bgColor: 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950', 
+      icon: HiClipboardList, 
+      iconColor: 'text-blue-600 dark:text-blue-400',
+      headerGradient: 'from-blue-500 to-blue-600'
+    },
+    { 
+      id: 'in-progress', 
+      title: 'In Progress', 
+      bgColor: 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950', 
+      icon: HiLightningBolt, 
+      iconColor: 'text-amber-600 dark:text-amber-400',
+      headerGradient: 'from-amber-500 to-orange-500'
+    },
+    { 
+      id: 'completed', 
+      title: 'Done', 
+      bgColor: 'bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950', 
+      icon: HiCheckCircle, 
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      headerGradient: 'from-emerald-500 to-green-500'
+    },
   ];
 
   const totalTasks = tasks.todo.length + tasks['in-progress'].length + tasks.completed.length;
@@ -202,53 +261,68 @@ const KanbanBoard = () => {
   return (
     <div>
       {/* Header with filters */}
-      <div className="flex flex-col gap-4 mb-6">
+      <div className="flex flex-col gap-4 mb-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Kanban Board</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {totalTasks} tasks • {completionRate}% complete
-            </p>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+              Kanban Board
+            </h1>
+            <div className="flex items-center gap-4 mt-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {totalTasks} tasks
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-emerald-500 to-green-500 transition-all duration-500"
+                    style={{ width: `${completionRate}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                  {completionRate}%
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Filter buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg font-medium ${
+            className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 ${
               filter === 'all'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300'
+                ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/30'
+                : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-600'
             }`}
           >
             All
           </button>
           <button
             onClick={() => setFilter('high')}
-            className={`px-4 py-2 rounded-lg font-medium ${
+            className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 ${
               filter === 'high'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300'
+                ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/30'
+                : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-600'
             }`}
           >
             High
           </button>
           <button
             onClick={() => setFilter('medium')}
-            className={`px-4 py-2 rounded-lg font-medium ${
+            className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 ${
               filter === 'medium'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300'
+                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg shadow-amber-500/30'
+                : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-600'
             }`}
           >
             Medium
           </button>
           <button
             onClick={() => setFilter('low')}
-            className={`px-4 py-2 rounded-lg font-medium ${
+            className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 ${
               filter === 'low'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300'
+                ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg shadow-emerald-500/30'
+                : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
             }`}
           >
             Low
@@ -257,8 +331,8 @@ const KanbanBoard = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center gap-3 bg-white dark:bg-black rounded-lg px-4 py-3 shadow-sm border border-gray-200 dark:border-red-600">
-          <HiSearch className="text-gray-400" size={20} />
+        <div className="flex items-center gap-3 bg-white dark:bg-gray-900 rounded-xl px-5 py-4 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-200 hover:border-red-300 dark:hover:border-red-600">
+          <HiSearch className="text-gray-400 group-hover:text-red-500 transition-colors duration-200" size={22} />
           <input
             type="text"
             placeholder="Search tasks by title, description, tags, status, or priority..."
@@ -269,7 +343,7 @@ const KanbanBoard = () => {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200 hover:scale-110 transform"
             >
               <HiX size={18} />
             </button>
@@ -295,23 +369,35 @@ const KanbanBoard = () => {
       {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {columns.map((column) => (
-            <div key={column.id} className={`${column.bgColor} rounded-xl p-4`}>
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2">
-                  <column.icon className={`${column.iconColor} text-2xl`} size={28} />
-                  <div>
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">{column.title}</h2>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {tasks[column.id].length} tasks
-                    </span>
+            <div key={column.id} className={`${column.bgColor} rounded-2xl p-5 shadow-lg border border-gray-200/50 dark:border-gray-800/50 transition-all duration-300 hover:shadow-2xl`}>
+              {/* Column Header */}
+              <div className={`bg-gradient-to-r ${column.headerGradient} rounded-xl p-4 mb-4 shadow-md`}>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 group-hover:scale-110 transition-transform duration-200">
+                      <column.icon className="text-white text-2xl" size={28} />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-white">{column.title}</h2>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-white/90 font-medium">
+                          {tasks[column.id].length} tasks
+                        </span>
+                        {column.id === 'completed' && totalTasks > 0 && (
+                          <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full text-white/90">
+                            {Math.round((tasks[column.id].length / totalTasks) * 100)}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
+                  <button
+                    onClick={() => openModal(column.id)}
+                    className="p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-all duration-200 transform hover:scale-110 hover:rotate-90 group"
+                  >
+                    <HiPlus className="text-white group-hover:scale-110 transition-transform" size={20} />
+                  </button>
                 </div>
-                <button
-                  onClick={() => openModal(column.id)}
-                  className="p-2 hover:bg-white dark:hover:bg-gray-600 rounded-lg transition-colors"
-                >
-                  <HiPlus className="text-gray-700 dark:text-gray-300" size={20} />
-                </button>
               </div>
 
               <div
@@ -325,22 +411,24 @@ const KanbanBoard = () => {
                     draggable
                     onDragStart={(e) => handleDragStart(e, task)}
                     onDragEnd={handleDragEnd}
-                    className={`bg-white dark:bg-black rounded-lg p-4 shadow-sm cursor-move hover:shadow-md transition-all dark:border dark:border-red-900 ${getPriorityColor(task.priority)}`}
+                    className={`bg-white dark:bg-gray-900 rounded-xl p-4 shadow-md cursor-move hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02] dark:border dark:border-gray-800 group ${getPriorityColor(task.priority)}`}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-white flex-1">{task.title}</h3>
-                      <div className="flex gap-1 ml-2">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="font-semibold text-gray-900 dark:text-white flex-1 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-200">
+                        {task.title}
+                      </h3>
+                      <div className="flex gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <button
                           onClick={() => openEditModal(task)}
-                          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                          className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200 transform hover:scale-110"
                         >
-                          <HiPencil size={14} className="text-blue-600" />
+                          <HiPencil size={16} className="text-blue-600 dark:text-blue-400" />
                         </button>
                         <button
                           onClick={() => handleDeleteTask(task._id)}
-                          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                          className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200 transform hover:scale-110"
                         >
-                          <HiTrash size={14} className="text-red-600" />
+                          <HiTrash size={16} className="text-red-600 dark:text-red-400" />
                         </button>
                       </div>
                     </div>
@@ -411,9 +499,12 @@ const KanbanBoard = () => {
                 ))}
 
                 {tasks[column.id].length === 0 && (
-                  <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                    <p className="text-sm">No tasks</p>
-                    <p className="text-xs mt-1">Drag tasks here or click + to add</p>
+                  <div className="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-600">
+                    <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4 animate-pulse">
+                      <column.icon className={column.iconColor} size={40} />
+                    </div>
+                    <p className="text-sm font-medium mb-1">No tasks yet</p>
+                    <p className="text-xs">Drag tasks here or click + to add</p>
                   </div>
                 )}
               </div>
@@ -457,47 +548,57 @@ const KanbanBoard = () => {
 
 // Task Form Modal Component
 const TaskFormModal = ({ title, formData, setFormData, onSubmit, onClose, isEdit }) => (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white dark:bg-black rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto dark:border dark:border-red-600">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{title}</h2>
+  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto dark:border dark:border-gray-700 shadow-2xl transform transition-all animate-slideUp">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+          {title}
+        </h2>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
+        >
+          <HiX className="text-gray-500 dark:text-gray-400" size={20} />
+        </button>
+      </div>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Title *
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Title <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             required
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-800 dark:text-white transition-all duration-200"
             placeholder="Enter task title"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
             Description
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows="3"
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-800 dark:text-white transition-all duration-200 resize-none"
             placeholder="Enter task description"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Priority *
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              Priority <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-800 dark:text-white transition-all duration-200"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -506,42 +607,42 @@ const TaskFormModal = ({ title, formData, setFormData, onSubmit, onClose, isEdit
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Due Date
             </label>
             <input
               type="date"
               value={formData.dueDate}
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-800 dark:text-white transition-all duration-200"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Tags (comma separated)
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Tags <span className="text-xs text-gray-500">(comma separated)</span>
           </label>
           <input
             type="text"
             value={formData.tags}
             onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-black dark:border-gray-600 dark:text-white"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-800 dark:text-white transition-all duration-200"
             placeholder="urgent, bug, feature"
           />
         </div>
 
-        <div className="flex gap-4 pt-2">
+        <div className="flex gap-4 pt-4">
           <button
             type="submit"
-            className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium"
+            className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-xl hover:from-red-700 hover:to-red-800 font-medium shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 transform hover:scale-105 transition-all duration-200"
           >
             {isEdit ? 'Update Task' : 'Create Task'}
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-950 font-medium"
+            className="flex-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 py-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-700 font-medium transform hover:scale-105 transition-all duration-200"
           >
             Cancel
           </button>
