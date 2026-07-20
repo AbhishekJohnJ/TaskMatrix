@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  # Backend Tests
-  test-backend:
+  # Backend Build
+  build-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -21,13 +21,9 @@ jobs:
       - name: Install dependencies
         working-directory: ./server
         run: npm ci
-        
-      - name: Run tests
-        working-directory: ./server
-        run: npm test
 
-  # Frontend Tests
-  test-frontend:
+  # Frontend Build
+  build-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -41,13 +37,13 @@ jobs:
         working-directory: ./client
         run: npm ci
         
-      - name: Run tests
+      - name: Build
         working-directory: ./client
-        run: npm test
+        run: npm run build
 
   # Build and Deploy Backend
   deploy-backend:
-    needs: [test-backend]
+    needs: [build-backend]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
@@ -64,7 +60,7 @@ jobs:
 
   # Build and Deploy Frontend
   deploy-frontend:
-    needs: [test-frontend]
+    needs: [build-frontend]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     

@@ -15,7 +15,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     networks:
-      - taskflow-network
+      - taskmatrix-network
 
   # Backend API
   backend:
