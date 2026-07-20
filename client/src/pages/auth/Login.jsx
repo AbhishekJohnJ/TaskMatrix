@@ -18,6 +18,16 @@ const Login = () => {
     setLoading(true);
     
     try {
+      // TEMPORARY: Demo mode - no backend required
+      // Remove this block when backend is ready and uncomment the real API call below
+      
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+      
+      toast.success('Login page deployed successfully! Connect backend to enable login.');
+      toast.info('This is demo mode - backend connection needed', { duration: 4000 });
+      
+      // REAL API CALL - Uncomment when backend is deployed:
+      /*
       const data = await authService.login({
         email: formData.email,
         password: formData.password,
@@ -29,6 +39,7 @@ const Login = () => {
 
       toast.success('Login successful!');
       navigate('/dashboard');
+      */
     } catch (error) {
       if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
         error.response.data.errors.forEach(err => {

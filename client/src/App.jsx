@@ -86,18 +86,18 @@ function App() {
 
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      {/* Public Routes - For now, redirect everything to login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
       
-      <Route element={<PublicRoute><AuthLayout /></PublicRoute>}>
+      <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Route>
 
-      {/* Protected Routes */}
-      <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+      {/* Temporarily disabled protected routes - will enable when backend is ready */}
+      {/* <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/tasks/:id" element={<TaskDetail />} />
@@ -109,10 +109,10 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
-      </Route>
+      </Route> */}
 
-      {/* 404 */}
-      <Route path="*" element={<NotFound />} />
+      {/* Redirect all other routes to login for now */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
